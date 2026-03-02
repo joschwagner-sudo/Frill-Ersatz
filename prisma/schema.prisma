@@ -1,0 +1,155 @@
+// Prisma Schema — Frill-Ersatz MVP
+// SQLite locally, Postgres-ready via DATABASE_URL swap
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ─── User ──────────────────────────────────────────────
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  isAdmin     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  lastLoginAt DateTime?
+
+  createdRequests  FeatureRequest[] @relation("CreatedRequests")
+  votes            Vote[]
+  comments         Comment[]
+  announcements    Announcement[]
+  emailLogs        AnnouncementEmailLog[]
+}
+
+// ─── Auth Code (Magic Link 6-digit) ───────────────────
+model AuthCode {
+  id        String    @id @default(cuid())
+  email     String
+  code      String    // bcrypt-hashed
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([email])
+}
+
+// ─── Feature Request ──────────────────────────────────
+model FeatureRequest {
+  id          String   @id @default(cuid())
+  title       String   // max 80 chars (validated in app)
+  description String   // markdown
+  type        String   @default("FEATURE") // FEATURE | BUG
+  status      String   @default("UNDER_REVIEW") // UNDER_REVIEW | PLANNED | IN_PROGRESS | DONE | NOT_PLANNED
+  tags        String   @default("") // comma-separated for SQLite simplicity
+  archived    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  createdById String
+  createdBy   User @relation("CreatedRequests", fields: [createdById], references: [id])
+
+  votes       Vote[]
+  comments    Comment[]
+  roadmapItem RoadmapItem?
+
+  @@index([createdById])
+  @@index([type])
+  @@index([status])
+}
+
+// ─── Vote ─────────────────────────────────────────────
+model Vote {
+  id               String   @id @default(cuid())
+  createdAt        DateTime @default(now())
+
+  userId           String
+  user             User @relation(fields: [userId], references: [id])
+
+  featureRequestId String
+  featureRequest   FeatureRequest @relation(fields: [featureRequestId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, featureRequestId])
+  @@index([featureRequestId])
+}
+
+// ─── Roadmap Item ─────────────────────────────────────
+model RoadmapItem {
+  id               String   @id @default(cuid())
+  quarter          String   // e.g. "2026-Q1"
+  priority         Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  featureRequestId String   @unique
+  featureRequest   FeatureRequest @relation(fields: [featureRequestId], references: [id], onDelete: Cascade)
+
+  @@index([quarter])
+}
+
+// ─── Announcement ─────────────────────────────────────
+model Announcement {
+  id          String    @id @default(cuid())
+  title       String    // max 100 chars (validated in app)
+  body        String    // markdown
+  publishedAt DateTime?
+  pinned      Boolean   @default(false)
+  emailSentAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  createdById String
+  createdBy   User @relation(fields: [createdById], references: [id])
+
+  emailLogs   AnnouncementEmailLog[]
+
+  @@index([publishedAt])
+}
+
+// ─── Announcement Email Log ───────────────────────────
+model AnnouncementEmailLog {
+  id             String   @id @default(cuid())
+  status         String   @default("QUEUED") // QUEUED | SENT | FAILED
+  error          String?
+  createdAt      DateTime @default(now())
+
+  announcementId String
+  announcement   Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+
+  userId         String
+  user           User @relation(fields: [userId], references: [id])
+
+  @@index([announcementId])
+}
+
+// ─── Report to Intercom ───────────────────────────────
+model ReportToIntercom {
+  id                     String   @id @default(cuid())
+  type                   String   // BUG | FEATURE
+  title                  String
+  description            String
+  userEmail              String
+  pageUrl                String?
+  intercomDeliveryStatus String   @default("PENDING") // PENDING | SENT | FAILED
+  intercomResponse       String?
+  createdAt              DateTime @default(now())
+}
+
+// ─── Comment ──────────────────────────────────────────
+model Comment {
+  id               String         @id @default(cuid())
+  body             String
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  userId           String
+  user             User           @relation(fields: [userId], references: [id])
+
+  featureRequestId String
+  featureRequest   FeatureRequest @relation(fields: [featureRequestId], references: [id], onDelete: Cascade)
+
+  @@index([featureRequestId])
+  @@index([userId])
+}

@@ -1,0 +1,131 @@
+# Frill-Ersatz MVP — Umsetzungs-Roadmap
+
+Interner Frill.co-Ersatz: Feature Requests + Voting + Roadmap + Announcements + Bug/Feature Report → Intercom.
+
+## Stack
+
+Next.js 14+ (App Router) · TypeScript · Tailwind CSS · Prisma · SQLite (Postgres-ready via `DATABASE_URL`)
+
+---
+
+## Nummerierte Umsetzungsschritte
+
+### Schritt 1 — Projekt initialisieren
+- `npx create-next-app@latest` mit App Router, TypeScript, Tailwind, ESLint
+- Boilerplate aufräumen, Ordnerstruktur anlegen
+
+### Schritt 2 — Dependencies installieren
+- `prisma`, `@prisma/client` — ORM
+- `zod` — Validierung
+- `bcryptjs` — Code-Hashing für Magic Links
+- `marked`, `dompurify`, `jsdom` — Markdown-Rendering & Sanitization
+- `resend` — Email (optional, für Prod)
+
+### Schritt 3 — Prisma Schema anlegen
+Alle 7 Models + `AuthCode`:
+
+| Model | Kern-Felder |
+|---|---|
+| `User` | id, email (unique), isAdmin, createdAt, lastLoginAt |
+| `AuthCode` | id, email, code (hashed), expiresAt, usedAt |
+| `FeatureRequest` | id, title(80), description(md), type(FEATURE/BUG), status(5 Werte), tags, archived, createdById |
+| `Vote` | id, userId, featureRequestId — **UNIQUE(userId, featureRequestId)** |
+| `RoadmapItem` | id, featureRequestId(unique), quarter("2026-Q1"), priority |
+| `Announcement` | id, title(100), body(md), publishedAt, pinned, emailSentAt, createdById |
+| `AnnouncementEmailLog` | id, announcementId, userId, status(QUEUED/SENT/FAILED), error |
+| `ReportToIntercom` | id, type(BUG/FEATURE), title, description, userEmail, pageUrl, deliveryStatus, response |
+
+### Schritt 4 — Migration & DB erstellen
+- `npx prisma migrate dev --name init`
+
+### Schritt 5 — Seed-Daten
+- 1 Admin + 5 User
+- 12 Requests (mix BUG/FEATURE, diverse Statuses)
+- Verteilte Votes
+- 3 Roadmap-Items aktuelles Quartal, 2 nächstes
+- 4 Announcements (2 published, 2 draft)
+
+### Schritt 6 — Environment & Config
+- `.env.example` mit allen Variablen
+- `lib/env.ts` — typisierter Zugriff auf ENV-Variablen
+- Admin-Check über `ADMIN_EMAILS`
+
+### Schritt 7 — Tailwind Design System
+- Custom Farbpalette (premium, modern, dark-mode-ready)
+- Basis-Styles in `globals.css`
+
+### Schritt 8 — Auth System (Magic Link)
+- Email eingeben → 6-stelliger Code → in DB gespeichert (bcrypt-hashed)
+- DEV: Code wird in Console geloggt
+- PROD: Code wird per Resend/SMTP gesendet
+- Code verifizieren → Session-Cookie setzen
+- Middleware für geschützte Routen
+
+### Schritt 9 — Feature Requests (CRUD + Listing)
+- `POST /api/requests` — erstellen (max 3/Tag/User enforced, 429 bei Limit)
+- `GET /api/requests` — Liste mit Filter (Type, Status, Tag), Sort (Trending/Neu/In Progress), Suche
+- `GET /api/requests/[id]` — Detail
+- UI: `/requests` (Cards mit Votes, Status-Badge, Type-Badge) + `/requests/[id]` (Detail + Vote-Button)
+
+### Schritt 10 — Voting
+- `POST /api/requests/[id]/vote` — Toggle Vote
+- DB Unique Constraint + API-Check → max 1 Vote/User/Feature
+- UI zeigt "Voted"-Zustand
+
+### Schritt 11 — Rate Limiting
+- Pro User: max 3 Requests/Kalendertag (Europe/Berlin)
+- Pro IP: max 10 Aktionen/Tag (Create + Report)
+- In-Memory Map (MVP), bei Überschreitung → 429
+
+### Schritt 12 — Roadmap
+- `GET /api/roadmap` — Items nach Quartal
+- Admin: `POST /api/roadmap` — Request zum Quartal zuordnen
+- **Max 3 Items/Quartal** — enforced serverseitig → 409 bei Limit
+- UI: `/roadmap` — Quartals-Tabs, je max 3 Items
+
+### Schritt 13 — Announcements / Changelog
+- CRUD für Announcements (Admin)
+- Publish: `publishedAt = now()` + Email-Versand an alle User
+- DEV: Emails in Console; PROD: Resend/SMTP
+- Email-Logs (SENT/FAILED) in `AnnouncementEmailLog`
+- UI: `/announcements` (Liste, pinned oben) + Detail-Seite
+
+### Schritt 14 — Bug/Feature Report → Intercom
+- UI: `/report` — Typ, Titel, Beschreibung, optionale URL
+- Submit → DB-Eintrag `ReportToIntercom`
+- Weiterleitung: `INTERCOM_WEBHOOK_URL` (POST JSON) oder Fallback Email an `INTERCOM_FORWARD_EMAIL`
+- Delivery-Status speichern, bei Fehler → Admin sieht es
+
+### Schritt 15 — Admin Panel
+- `/admin` — Dashboard: pending Requests, failed Reports, draft Announcements
+- Requests: Status ändern, Tags, archivieren
+- Roadmap: Quartale verwalten (Limit 3 enforced)
+- Announcements: CRUD + Publish
+- Auth: nur User mit Email in `ADMIN_EMAILS`
+
+### Schritt 16 — Security & Validation
+- Zod-Schemas für alle API-Inputs
+- Markdown-Sanitization (kein Script-Injection)
+- Server-side Authorization Checks (nicht nur UI)
+
+### Schritt 17 — README & Dokumentation
+- Setup-Anleitung: `npm i` → `npx prisma migrate dev` → `npx prisma db seed` → `npm run dev`
+- ENV-Dokumentation
+- MVP-Entscheidungen dokumentiert
+
+### Schritt 18 — Verifizierung
+- Build testet (`npm run build`)
+- Seed läuft fehlerfrei
+- Browser-Test aller Seiten
+- Business Rules manuell testen (Limits provozieren)
+
+---
+
+## Business Rules (nicht verhandelbar)
+
+| Regel | Enforcement | HTTP bei Verstoß |
+|---|---|---|
+| Max 3 Requests/Tag/User | DB-Count + API-Check | `429` |
+| Max 1 Vote/Feature/User | DB Unique Constraint + API | `409` |
+| Max 3 Roadmap-Items/Quartal | DB-Count + API-Check | `409` |
+| Rate Limit IP 10/Tag | In-Memory Counter | `429` |
