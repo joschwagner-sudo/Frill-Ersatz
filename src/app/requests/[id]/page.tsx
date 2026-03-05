@@ -8,11 +8,11 @@ import CommentSection from "@/components/CommentSection";
 export const dynamic = "force-dynamic";
 
 const statusConfig: Record<string, { label: string; class: string }> = {
-    UNDER_REVIEW: { label: "Under Review", class: "badge-review" },
-    PLANNED: { label: "Planned", class: "badge-planned" },
-    IN_PROGRESS: { label: "In Progress", class: "badge-progress" },
-    DONE: { label: "Done", class: "badge-done" },
-    NOT_PLANNED: { label: "Not Planned", class: "badge-rejected" },
+    UNDER_REVIEW: { label: "Wird geprüft", class: "badge-review" },
+    PLANNED: { label: "Geplant", class: "badge-planned" },
+    IN_PROGRESS: { label: "In Arbeit", class: "badge-progress" },
+    DONE: { label: "Umgesetzt", class: "badge-done" },
+    NOT_PLANNED: { label: "Nicht geplant", class: "badge-rejected" },
 };
 
 const typeConfig: Record<string, { label: string; class: string }> = {
@@ -67,7 +67,7 @@ export default async function RequestDetailPage({
                     marginBottom: "1.5rem",
                 }}
             >
-                ← Back to requests
+                ← Zurück zu Ideen
             </Link>
 
             <div className="card" style={{ padding: "1.5rem" }}>
@@ -84,7 +84,7 @@ export default async function RequestDetailPage({
                     <div className="vote-btn" style={{ cursor: "default" }}>
                         <span style={{ fontSize: "1rem" }}>▲</span>
                         <span style={{ fontSize: "1.25rem", fontWeight: 800 }}>{voteCount}</span>
-                        <span style={{ fontSize: "0.625rem", color: "var(--muted)" }}>votes</span>
+                        <span style={{ fontSize: "0.625rem", color: "var(--muted)" }}>Stimmen</span>
                     </div>
 
                     <div style={{ flex: 1 }}>
@@ -116,9 +116,9 @@ export default async function RequestDetailPage({
                                 color: "var(--muted)",
                             }}
                         >
-                            <span>by {request.createdBy.email.split("@")[0]}</span>
+                            <span>von {request.createdBy.email.split("@")[0]}</span>
                             <span>·</span>
-                            <span>{new Date(request.createdAt).toLocaleDateString()}</span>
+                            <span>{new Date(request.createdAt).toLocaleDateString("de-DE")}</span>
                             {request.tags && (
                                 <>
                                     <span>·</span>
@@ -151,7 +151,7 @@ export default async function RequestDetailPage({
                             marginBottom: "1.25rem",
                         }}
                     >
-                        🗺️ On Roadmap — {request.roadmapItem.quarter}
+                        🗺️ Auf der Roadmap — {request.roadmapItem.quarter}
                     </div>
                 )}
 

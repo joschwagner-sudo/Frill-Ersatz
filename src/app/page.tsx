@@ -4,7 +4,6 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  // Quick stats from DB
   const [requestCount, totalVotes, userCount] = await Promise.all([
     prisma.featureRequest.count({ where: { archived: false } }),
     prisma.vote.count(),
@@ -24,28 +23,28 @@ export default async function HomePage() {
             marginBottom: "1rem",
           }}
         >
-          Shape the product
+          Gestalte den Copilot
           <br />
-          <span style={{ color: "var(--color-primary-500)" }}>together</span>
+          <span style={{ color: "var(--color-primary-500)" }}>mit</span>
         </h1>
         <p
           style={{
             fontSize: "1.125rem",
             color: "var(--muted)",
-            maxWidth: "480px",
+            maxWidth: "520px",
             margin: "0 auto 2rem",
             lineHeight: 1.6,
           }}
         >
-          Submit feature requests, vote on ideas, and follow our roadmap.
-          Your feedback drives what we build next.
+          Hier siehst du, woran wir arbeiten — und kannst mitbestimmen, was als Nächstes kommt.
+          Reiche eigene Ideen ein oder stimme für bestehende Vorschläge ab.
         </p>
         <div style={{ display: "flex", gap: "0.75rem", justifyContent: "center" }}>
           <Link href="/requests" className="btn-primary" style={{ padding: "0.625rem 1.5rem" }}>
-            💡 Browse Requests
+            💡 Ideen ansehen
           </Link>
           <Link href="/roadmap" className="btn-secondary" style={{ padding: "0.625rem 1.5rem" }}>
-            🗺️ View Roadmap
+            🗺️ Roadmap
           </Link>
         </div>
       </div>
@@ -60,9 +59,9 @@ export default async function HomePage() {
         }}
       >
         {[
-          { label: "Feature Requests", value: requestCount, icon: "💡" },
-          { label: "Total Votes", value: totalVotes, icon: "▲" },
-          { label: "Community Members", value: userCount, icon: "👥" },
+          { label: "Vorschläge", value: requestCount, icon: "💡" },
+          { label: "Abstimmungen", value: totalVotes, icon: "▲" },
+          { label: "Mitglieder", value: userCount, icon: "👥" },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -98,14 +97,14 @@ export default async function HomePage() {
           {
             href: "/announcements",
             icon: "📣",
-            title: "Changelog",
-            desc: "See what's new and what's coming",
+            title: "Neuigkeiten",
+            desc: "Was gibt's Neues und was kommt als Nächstes",
           },
           {
             href: "/report",
-            icon: "🐛",
-            title: "Report an Issue",
-            desc: "Found a bug? Let us know",
+            icon: "🛟",
+            title: "Problem melden",
+            desc: "Bug gefunden? Wir helfen dir weiter",
           },
         ].map((link) => (
           <Link

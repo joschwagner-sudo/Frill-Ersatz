@@ -27,10 +27,10 @@ export default function LoginPage() {
                 setStep("code");
             } else {
                 const data = await res.json();
-                setError(data.error || "Failed to send code");
+                setError(data.error || "Fehler beim Senden des Codes");
             }
         } catch {
-            setError("Network error");
+            setError("Netzwerkfehler");
         } finally {
             setLoading(false);
         }
@@ -53,10 +53,10 @@ export default function LoginPage() {
                 router.refresh();
             } else {
                 const data = await res.json();
-                setError(data.error || "Invalid code");
+                setError(data.error || "Ungültiger Code");
             }
         } catch {
-            setError("Network error");
+            setError("Netzwerkfehler");
         } finally {
             setLoading(false);
         }
@@ -73,12 +73,12 @@ export default function LoginPage() {
             <div style={{ textAlign: "center", marginBottom: "2rem" }}>
                 <div style={{ fontSize: "2.5rem", marginBottom: "0.75rem" }}>🔐</div>
                 <h1 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.02em" }}>
-                    Sign In
+                    Anmelden
                 </h1>
                 <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "0.375rem" }}>
                     {step === "email"
-                        ? "Enter your email to receive a sign-in code"
-                        : `We sent a 6-digit code to ${email}`}
+                        ? "Gib deine E-Mail-Adresse ein, um einen Anmeldecode zu erhalten"
+                        : `Wir haben einen 6-stelligen Code an ${email} gesendet`}
                 </p>
             </div>
 
@@ -95,7 +95,7 @@ export default function LoginPage() {
                                     marginBottom: "0.375rem",
                                 }}
                             >
-                                Email
+                                E-Mail
                             </label>
                             <input
                                 id="email"
@@ -103,7 +103,7 @@ export default function LoginPage() {
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder="you@example.com"
+                                placeholder="du@beispiel.de"
                                 className="input"
                                 autoFocus
                             />
@@ -114,7 +114,7 @@ export default function LoginPage() {
                             </p>
                         )}
                         <button type="submit" className="btn-primary" style={{ width: "100%" }} disabled={loading}>
-                            {loading ? "Sending..." : "Send Code"}
+                            {loading ? "Wird gesendet..." : "Code senden"}
                         </button>
                     </form>
                 ) : (
@@ -129,7 +129,7 @@ export default function LoginPage() {
                                     marginBottom: "0.375rem",
                                 }}
                             >
-                                6-Digit Code
+                                6-stelliger Code
                             </label>
                             <input
                                 id="code"
@@ -156,7 +156,7 @@ export default function LoginPage() {
                             </p>
                         )}
                         <button type="submit" className="btn-primary" style={{ width: "100%" }} disabled={loading}>
-                            {loading ? "Verifying..." : "Verify Code"}
+                            {loading ? "Wird überprüft..." : "Code bestätigen"}
                         </button>
                         <button
                             type="button"
@@ -168,21 +168,10 @@ export default function LoginPage() {
                                 setError("");
                             }}
                         >
-                            Use a different email
+                            Andere E-Mail verwenden
                         </button>
                     </form>
                 )}
-
-                <p
-                    style={{
-                        marginTop: "1rem",
-                        fontSize: "0.75rem",
-                        color: "var(--muted-foreground)",
-                        textAlign: "center",
-                    }}
-                >
-                    💡 In dev mode, check the terminal for the code
-                </p>
             </div>
         </div>
     );

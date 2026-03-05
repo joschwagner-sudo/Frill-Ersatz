@@ -1,12 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -14,15 +9,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Frill Ersatz — Feature Requests & Roadmap",
-  description: "Submit feature requests, vote on ideas, and track our product roadmap.",
+  title: "Copilot — Feedback & Roadmap",
+  description: "Feature-Vorschläge einreichen, abstimmen und unsere Roadmap verfolgen.",
 };
 
 const navItems = [
-  { href: "/requests", label: "Requests", icon: "💡" },
+  { href: "/requests", label: "Ideen", icon: "💡" },
   { href: "/roadmap", label: "Roadmap", icon: "🗺️" },
-  { href: "/announcements", label: "Changelog", icon: "📣" },
-  { href: "/report", label: "Report", icon: "🐛" },
+  { href: "/announcements", label: "Neuigkeiten", icon: "📣" },
+  { href: "/report", label: "Hilfe", icon: "🛟" },
 ];
 
 export default function RootLayout({
@@ -31,9 +26,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="de">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistMono.variable} antialiased`}
       >
         {/* ─── Top Navigation ─── */}
         <header
@@ -71,8 +74,11 @@ export default function RootLayout({
                 letterSpacing: "-0.02em",
               }}
             >
-              <span style={{ fontSize: "1.25rem" }}>✦</span>
-              Feedback Hub
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="24" height="24" rx="6" fill="#4D6BDD"/>
+                <path d="M7 12.5C7 9.46 9.46 7 12.5 7H14V9.5H12.5C10.84 9.5 9.5 10.84 9.5 12.5C9.5 14.16 10.84 15.5 12.5 15.5H14V13H16.5V18H12.5C9.46 18 7 15.54 7 12.5Z" fill="white"/>
+              </svg>
+              Copilot
             </Link>
 
             {/* Nav Links */}
@@ -89,10 +95,8 @@ export default function RootLayout({
               ))}
             </nav>
 
-            {/* Auth placeholder */}
-            <Link href="/login" className="btn-primary" style={{ fontSize: "0.8125rem" }}>
-              Sign In
-            </Link>
+            {/* Auth placeholder — hidden since all users are logged in */}
+            <div style={{ width: "1px" }} />
           </div>
         </header>
 

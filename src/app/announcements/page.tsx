@@ -15,10 +15,10 @@ export default async function AnnouncementsPage() {
         <div className="animate-in" style={{ maxWidth: "720px", margin: "0 auto" }}>
             <div style={{ marginBottom: "2rem" }}>
                 <h1 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.02em" }}>
-                    Changelog
+                    Neuigkeiten
                 </h1>
                 <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "0.25rem" }}>
-                    Updates, new features, and improvements
+                    Updates, neue Features und Verbesserungen
                 </p>
             </div>
 
@@ -28,7 +28,7 @@ export default async function AnnouncementsPage() {
                     style={{ padding: "3rem", textAlign: "center", color: "var(--muted)" }}
                 >
                     <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>📣</div>
-                    <p>No announcements yet</p>
+                    <p>Noch keine Neuigkeiten</p>
                 </div>
             ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -65,17 +65,17 @@ export default async function AnnouncementsPage() {
                                             borderRadius: "4px",
                                         }}
                                     >
-                                        📌 PINNED
+                                        📌 ANGEPINNT
                                     </span>
                                 )}
                                 <span style={{ fontSize: "0.8125rem", color: "var(--muted)" }}>
                                     {ann.publishedAt
-                                        ? new Date(ann.publishedAt).toLocaleDateString("en-US", {
+                                        ? new Date(ann.publishedAt).toLocaleDateString("de-DE", {
                                             year: "numeric",
                                             month: "long",
                                             day: "numeric",
                                         })
-                                        : "Draft"}
+                                        : "Entwurf"}
                                 </span>
                             </div>
 
@@ -90,7 +90,6 @@ export default async function AnnouncementsPage() {
                                 {ann.title}
                             </h2>
 
-                            {/* Body (rendered as plain text for now, markdown later) */}
                             <div
                                 style={{
                                     fontSize: "0.9375rem",
@@ -112,7 +111,7 @@ export default async function AnnouncementsPage() {
                                     color: "var(--muted-foreground)",
                                 }}
                             >
-                                Posted by {ann.createdBy.email.split("@")[0]}
+                                Veröffentlicht von {ann.createdBy.email.split("@")[0]}
                             </div>
                         </article>
                     ))}

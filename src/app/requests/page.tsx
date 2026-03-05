@@ -4,11 +4,11 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 const statusConfig: Record<string, { label: string; class: string }> = {
-    UNDER_REVIEW: { label: "Under Review", class: "badge-review" },
-    PLANNED: { label: "Planned", class: "badge-planned" },
-    IN_PROGRESS: { label: "In Progress", class: "badge-progress" },
-    DONE: { label: "Done", class: "badge-done" },
-    NOT_PLANNED: { label: "Not Planned", class: "badge-rejected" },
+    UNDER_REVIEW: { label: "Wird geprüft", class: "badge-review" },
+    PLANNED: { label: "Geplant", class: "badge-planned" },
+    IN_PROGRESS: { label: "In Arbeit", class: "badge-progress" },
+    DONE: { label: "Umgesetzt", class: "badge-done" },
+    NOT_PLANNED: { label: "Nicht geplant", class: "badge-rejected" },
 };
 
 const typeConfig: Record<string, { label: string; class: string }> = {
@@ -62,14 +62,14 @@ export default async function RequestsPage({
             >
                 <div>
                     <h1 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.02em" }}>
-                        Feature Requests
+                        Ideen & Vorschläge
                     </h1>
                     <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "0.25rem" }}>
-                        {requests.length} request{requests.length !== 1 ? "s" : ""}
+                        {requests.length} {requests.length === 1 ? "Vorschlag" : "Vorschläge"}
                     </p>
                 </div>
                 <Link href="/requests/new" className="btn-primary">
-                    + New Request
+                    + Idee einreichen
                 </Link>
             </div>
 
@@ -87,7 +87,7 @@ export default async function RequestsPage({
                     <input
                         type="text"
                         name="q"
-                        placeholder="Search requests..."
+                        placeholder="Vorschläge durchsuchen..."
                         defaultValue={q}
                         className="input"
                     />
@@ -111,7 +111,7 @@ export default async function RequestsPage({
                                     : {}),
                             }}
                         >
-                            {s === "all" ? "All" : statusConfig[s]?.label || s}
+                            {s === "all" ? "Alle" : statusConfig[s]?.label || s}
                         </Link>
                     ))}
                 </div>
@@ -119,8 +119,8 @@ export default async function RequestsPage({
                 {/* Sort */}
                 <div style={{ display: "flex", gap: "0.25rem" }}>
                     {[
-                        { value: "newest", label: "Newest" },
-                        { value: "votes", label: "Top Voted" },
+                        { value: "newest", label: "Neueste" },
+                        { value: "votes", label: "Meiste Stimmen" },
                     ].map((s) => (
                         <Link
                             key={s.value}
@@ -148,7 +148,7 @@ export default async function RequestsPage({
                         style={{ padding: "3rem", textAlign: "center", color: "var(--muted)" }}
                     >
                         <div style={{ fontSize: "2rem", marginBottom: "0.5rem" }}>🔍</div>
-                        <p>No requests found</p>
+                        <p>Keine Vorschläge gefunden</p>
                     </div>
                 ) : (
                     requests.map((req) => (
@@ -213,7 +213,7 @@ export default async function RequestsPage({
                                 >
                                     <span>{req.createdBy.email.split("@")[0]}</span>
                                     <span>·</span>
-                                    <span>{new Date(req.createdAt).toLocaleDateString()}</span>
+                                    <span>{new Date(req.createdAt).toLocaleDateString("de-DE")}</span>
                                     {req.tags && (
                                         <>
                                             <span>·</span>

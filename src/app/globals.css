@@ -1,47 +1,47 @@
 @import "tailwindcss";
 
-/* ─── Design Tokens ──────────────────────────────────── */
+/* ─── Design Tokens (Finanzfluss) ────────────────────── */
 @theme inline {
-  /* Brand Colors */
-  --color-primary-50: #eef2ff;
-  --color-primary-100: #e0e7ff;
-  --color-primary-200: #c7d2fe;
-  --color-primary-300: #a5b4fc;
-  --color-primary-400: #818cf8;
-  --color-primary-500: #6366f1;
-  --color-primary-600: #4f46e5;
-  --color-primary-700: #4338ca;
-  --color-primary-800: #3730a3;
-  --color-primary-900: #312e81;
+  /* Brand Colors — Finanzfluss Blue */
+  --color-primary-50: #EDF0FC;
+  --color-primary-100: #DBE1F9;
+  --color-primary-200: #B7C3F3;
+  --color-primary-300: #93A5ED;
+  --color-primary-400: #6F87E7;
+  --color-primary-500: #4D6BDD;
+  --color-primary-600: #3A56C9;
+  --color-primary-700: #2E44A0;
+  --color-primary-800: #223378;
+  --color-primary-900: #162250;
 
-  /* Neutral */
-  --color-surface-50: #fafafa;
-  --color-surface-100: #f4f4f5;
-  --color-surface-200: #e4e4e7;
-  --color-surface-300: #d4d4d8;
-  --color-surface-400: #a1a1aa;
-  --color-surface-500: #71717a;
-  --color-surface-600: #52525b;
-  --color-surface-700: #3f3f46;
-  --color-surface-800: #27272a;
-  --color-surface-900: #18181b;
-  --color-surface-950: #09090b;
+  /* Neutral — Finanzfluss Dark Navy */
+  --color-surface-50: #F9F9FA;
+  --color-surface-100: #F0F1F4;
+  --color-surface-200: #E0E2E8;
+  --color-surface-300: #C8CCD6;
+  --color-surface-400: #8A93A5;
+  --color-surface-500: #6D778B;
+  --color-surface-600: #44536F;
+  --color-surface-700: #2E3A54;
+  --color-surface-800: #1F2940;
+  --color-surface-900: #15284B;
+  --color-surface-950: #0D1A33;
 
   /* Semantic */
   --color-success: #10b981;
-  --color-warning: #f59e0b;
+  --color-warning: #D87C13;
   --color-error: #ef4444;
-  --color-info: #3b82f6;
+  --color-info: #4D6BDD;
 
   /* Status Colors */
-  --color-status-review: #f59e0b;
-  --color-status-planned: #6366f1;
-  --color-status-progress: #3b82f6;
+  --color-status-review: #D87C13;
+  --color-status-planned: #4D6BDD;
+  --color-status-progress: #3B82F6;
   --color-status-done: #10b981;
-  --color-status-rejected: #6b7280;
+  --color-status-rejected: #8A93A5;
 
-  /* Fonts */
-  --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  /* Fonts — Finanzfluss uses Outfit */
+  --font-sans: 'Outfit', system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-geist-mono), 'SF Mono', monospace;
 
   /* Background/Foreground */
@@ -49,37 +49,37 @@
   --color-foreground: var(--foreground);
 }
 
-/* ─── Light Mode ─────────────────────────────────────── */
+/* ─── Light Mode (Finanzfluss) ───────────────────────── */
 :root {
-  --background: #fafafa;
-  --foreground: #18181b;
+  --background: #FFFFFF;
+  --foreground: #15284B;
   --card-bg: #ffffff;
-  --card-border: #e4e4e7;
+  --card-border: #E0E2E8;
   --sidebar-bg: #ffffff;
-  --nav-bg: rgba(255, 255, 255, 0.8);
-  --muted: #71717a;
-  --muted-foreground: #a1a1aa;
-  --accent-bg: #eef2ff;
-  --hover-bg: #f4f4f5;
+  --nav-bg: rgba(255, 255, 255, 0.9);
+  --muted: #6D778B;
+  --muted-foreground: #8A93A5;
+  --accent-bg: #EDF0FC;
+  --hover-bg: #F9F9FA;
   --input-bg: #ffffff;
-  --input-border: #d4d4d8;
+  --input-border: #C8CCD6;
 }
 
-/* ─── Dark Mode ──────────────────────────────────────── */
+/* ─── Dark Mode (Finanzfluss) ────────────────────────── */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #09090b;
-    --foreground: #fafafa;
-    --card-bg: #18181b;
-    --card-border: #27272a;
-    --sidebar-bg: #18181b;
-    --nav-bg: rgba(9, 9, 11, 0.8);
-    --muted: #a1a1aa;
-    --muted-foreground: #71717a;
-    --accent-bg: #1e1b4b;
-    --hover-bg: #27272a;
-    --input-bg: #27272a;
-    --input-border: #3f3f46;
+    --background: #0D1A33;
+    --foreground: #F0F1F4;
+    --card-bg: #15284B;
+    --card-border: #2E3A54;
+    --sidebar-bg: #15284B;
+    --nav-bg: rgba(13, 26, 51, 0.9);
+    --muted: #8A93A5;
+    --muted-foreground: #6D778B;
+    --accent-bg: #1F2940;
+    --hover-bg: #1F2940;
+    --input-bg: #1F2940;
+    --input-border: #2E3A54;
   }
 }
 
