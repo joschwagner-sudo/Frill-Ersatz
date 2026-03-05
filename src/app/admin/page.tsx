@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -15,6 +16,10 @@ async function getSession() {
         return null;
     }
 }
+
+type RequestWithRelations = Prisma.FeatureRequestGetPayload<{
+    include: { createdBy: { select: { email: true } }; _count: { select: { votes: true } } };
+}>;
 
 export default async function AdminPage() {
     const session = await getSession();
@@ -70,7 +75,7 @@ export default async function AdminPage() {
                 Recent Requests
             </h2>
             <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                {recentRequests.map((req) => (
+                {recentRequests.map((req: RequestWithRelations) => (
                     <div key={req.id} className="card" style={{ padding: "0.75rem 1rem", display: "flex", alignItems: "center", gap: "1rem" }}>
                         <div style={{ flex: 1 }}>
                             <div style={{ fontWeight: 600, fontSize: "0.875rem" }}>{req.title}</div>

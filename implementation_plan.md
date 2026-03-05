@@ -54,13 +54,29 @@ Upgrade the Frill-Ersatz MVP to professional standards with robust validation, r
 - Add a comments section at the bottom.
 - Add a simple "Add Comment" form (if logged in).
 
+---
+
+### [Cloud Deployment]
+
+#### [schema.prisma](file:///Users/joschwagner/Frill%20Ersatz/prisma/schema.prisma)
+- Change `provider` from "sqlite" to "postgresql".
+- Ensure all models are compatible (most are, but BigInt/Decimal might need care - not used here).
+
+#### [.env](file:///Users/joschwagner/Frill%20Ersatz/.env)
+- Update `DATABASE_URL` with the new Cloud DB connection string.
+
+#### [GitHub & Vercel]
+- Initialize Git repository.
+- Connect local repo to a new GitHub repository.
+- Connect GitHub to Vercel for automatic deployments.
+
 ## Verification Plan
 
 ### Automated Tests
-- I will write a scratch script `verify_zod.ts` to test schemas against valid/invalid edge cases.
-- Run `npx prisma migrate dev --name add_comments` to verify schema changes.
+- `npx prisma migrate dev` against the new Cloud DB.
+- `npm run build` to ensure production readiness.
 
 ### Manual Verification
-1. **Zod**: Try to submit a request with an empty title or invalid email and verify the error message.
-2. **Markdown**: Post a request with `**bold**`, `*italic*`, and `# headers` and verify they render correctly.
-3. **Comments**: Log in, post a comment, and verify it appears on the page.
+1. **GitHub**: Verify code is pushed correctly.
+2. **Vercel**: Check deployment logs and verify the public URL.
+3. **Database**: Ensure data is persisting in the Cloud DB (Supabase/Neon dashboard).
