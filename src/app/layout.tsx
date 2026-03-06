@@ -17,7 +17,6 @@ const navItems = [
   { href: "/requests", label: "Ideen", icon: "💡" },
   { href: "/roadmap", label: "Roadmap", icon: "🗺️" },
   { href: "/announcements", label: "Neuigkeiten", icon: "📣" },
-  { href: "/report", label: "Hilfe", icon: "🛟" },
 ];
 
 export default function RootLayout({
