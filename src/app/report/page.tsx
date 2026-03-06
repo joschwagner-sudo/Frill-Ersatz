@@ -3,40 +3,103 @@
 import { useState } from "react";
 
 const categories = [
-    "Kontoverwaltung",
-    "Portfolio & Depots",
-    "Datenimport",
-    "Berechnungen & Auswertungen",
-    "Benachrichtigungen",
-    "Sonstiges",
+    { label: "Dashboard & Übersicht", icon: "📊" },
+    { label: "Import & Daten", icon: "📥" },
+    { label: "Portfolios & Konten", icon: "🏦" },
+    { label: "Investments & Wertpapiere", icon: "📈" },
+    { label: "Dividenden", icon: "💰" },
+    { label: "Rendite & Berechnungen", icon: "🧮" },
+    { label: "Budget", icon: "💳" },
+    { label: "Konto & Sicherheit", icon: "🔒" },
+    { label: "Sonstiges", icon: "❓" },
 ];
 
 const helpcenterArticles: Record<string, { title: string; url: string }[]> = {
-    "Kontoverwaltung": [
-        { title: "Passwort zurücksetzen", url: "#" },
-        { title: "E-Mail-Adresse ändern", url: "#" },
-        { title: "Konto löschen", url: "#" },
+    "Dashboard & Übersicht": [
+        { title: "Dashboard", url: "https://www.finanzfluss.de/copilot/hilfe/dashboard/" },
+        { title: "Das Dashboard in der Copilot App", url: "https://www.finanzfluss.de/copilot/hilfe/dashboard-app/" },
+        { title: "Abweichende Werte im Dashboard", url: "https://www.finanzfluss.de/copilot/hilfe/abweichende-werte-im-dashboard/" },
+        { title: "Breakdown", url: "https://www.finanzfluss.de/copilot/hilfe/breakdown/" },
+        { title: "Analyse", url: "https://www.finanzfluss.de/copilot/hilfe/analyse/" },
     ],
-    "Portfolio & Depots": [
-        { title: "Depot verknüpfen", url: "#" },
-        { title: "Depot manuell anlegen", url: "#" },
-        { title: "Transaktionen importieren", url: "#" },
+    "Import & Daten": [
+        { title: "Automatischer Import", url: "https://www.finanzfluss.de/copilot/hilfe/auto-import/" },
+        { title: "Autoimport: Schritt-für-Schritt-Anleitungen", url: "https://www.finanzfluss.de/copilot/hilfe/automatischer-import/" },
+        { title: "CSV Import", url: "https://www.finanzfluss.de/copilot/hilfe/csv-import/" },
+        { title: "PDF Import", url: "https://www.finanzfluss.de/copilot/hilfe/pdf-import/" },
+        { title: "Manueller Import", url: "https://www.finanzfluss.de/copilot/hilfe/auto-import-nicht-unterstutzt/" },
+        { title: "Fehlerhafte Importe", url: "https://www.finanzfluss.de/copilot/hilfe/importe/" },
+        { title: "Unterstützte Anbieter", url: "https://www.finanzfluss.de/copilot/hilfe/unterstuetzte-anbieter/" },
+        { title: "Unterstützte Konten für Auto-Import", url: "https://www.finanzfluss.de/copilot/hilfe/unterstutzte-konten-fur-auto-import/" },
+        { title: "Backup via CSV", url: "https://www.finanzfluss.de/copilot/hilfe/backup/" },
     ],
-    "Datenimport": [
-        { title: "CSV-Import Anleitung", url: "#" },
-        { title: "Unterstützte Banken & Broker", url: "#" },
-        { title: "Importfehler beheben", url: "#" },
+    "Portfolios & Konten": [
+        { title: "Portfolios & Konten", url: "https://www.finanzfluss.de/copilot/hilfe/portfolios-und-konten/" },
+        { title: "Depots/Konten ein- und ausblenden", url: "https://www.finanzfluss.de/copilot/hilfe/depot-ausblenden/" },
+        { title: "Konto aktualisieren", url: "https://www.finanzfluss.de/copilot/hilfe/konto-aktualisieren/" },
+        { title: "Konto oder Depot löschen", url: "https://www.finanzfluss.de/copilot/hilfe/konto-loschen/" },
+        { title: "Bankverbindung aufheben", url: "https://www.finanzfluss.de/copilot/hilfe/bankverbindung-aufheben/" },
+        { title: "Verrechnungskonto ändern", url: "https://www.finanzfluss.de/copilot/hilfe/falsches-verrechnungskonto/" },
+        { title: "Depot teilen", url: "https://www.finanzfluss.de/copilot/hilfe/teilen/" },
     ],
-    "Berechnungen & Auswertungen": [
-        { title: "Wie wird die Rendite berechnet?", url: "#" },
-        { title: "Steuerliche Auswertungen", url: "#" },
+    "Investments & Wertpapiere": [
+        { title: "Investments", url: "https://www.finanzfluss.de/copilot/hilfe/investment-seite/" },
+        { title: "Watchlist", url: "https://www.finanzfluss.de/copilot/hilfe/watchlist/" },
+        { title: "Watchlist anpassen", url: "https://www.finanzfluss.de/copilot/hilfe/watchlist-anpassen/" },
+        { title: "Manueller Wertpapierkauf und -verkauf", url: "https://www.finanzfluss.de/copilot/hilfe/manueller-kauf/" },
+        { title: "Manuellen Depotübertrag einrichten", url: "https://www.finanzfluss.de/copilot/hilfe/depotuebertrag-manuell/" },
+        { title: "Manueller Aktiensplit", url: "https://www.finanzfluss.de/copilot/hilfe/aktiensplit/" },
+        { title: "Manueller Aktientausch", url: "https://www.finanzfluss.de/copilot/hilfe/aktientausch/" },
+        { title: "Manueller Spin-off", url: "https://www.finanzfluss.de/copilot/hilfe/spinoff/" },
+        { title: "Börsenplatz bearbeiten", url: "https://www.finanzfluss.de/copilot/hilfe/boersenplatz-bearbeiten/" },
+        { title: "Fehlendes Wertpapier", url: "https://www.finanzfluss.de/copilot/hilfe/fehlendes-wertpapier/" },
+        { title: "Edelmetalle manuell hinzufügen", url: "https://www.finanzfluss.de/copilot/hilfe/edelmetalle-manuell-hinzufugen/" },
+        { title: "Sonstige Vermögenswerte hinzufügen", url: "https://www.finanzfluss.de/copilot/hilfe/sonstige/" },
+        { title: "Kauf vs Einbuchung", url: "https://www.finanzfluss.de/copilot/hilfe/kauf-vs-einbuchung/" },
+        { title: "Unterstützte Börsenplätze", url: "https://www.finanzfluss.de/copilot/hilfe/unterstutzte-borsenplatze/" },
     ],
-    "Benachrichtigungen": [
-        { title: "Push-Benachrichtigungen einrichten", url: "#" },
-        { title: "E-Mail-Benachrichtigungen verwalten", url: "#" },
+    "Dividenden": [
+        { title: "Dividenden", url: "https://www.finanzfluss.de/copilot/hilfe/dividenden-seite/" },
+        { title: "Dividendenimport", url: "https://www.finanzfluss.de/copilot/hilfe/dividendenimport/" },
+        { title: "Dividenden manuell hinzufügen", url: "https://www.finanzfluss.de/copilot/hilfe/dividenden-manuell-hinzufugen/" },
+        { title: "Inkorrekter Wert im Dividendenkalender", url: "https://www.finanzfluss.de/copilot/hilfe/dividendenkalender-inkorrekt/" },
+    ],
+    "Rendite & Berechnungen": [
+        { title: "Zeitgewichtete Rendite (TWROR)", url: "https://www.finanzfluss.de/copilot/hilfe/zeitgewichtete-rendite/" },
+        { title: "Interner Zinsfuß (IZF)", url: "https://www.finanzfluss.de/copilot/hilfe/izf/" },
+        { title: "Vorabpauschale", url: "https://www.finanzfluss.de/copilot/hilfe/vorabpauschale/" },
+        { title: "Freistellungsauftrag", url: "https://www.finanzfluss.de/copilot/hilfe/freistellungsauftrag/" },
+        { title: "Unterschiedliche Performance-Kennzahlen", url: "https://www.finanzfluss.de/copilot/hilfe/unterschied-twror-kursgewinn/" },
+        { title: "Warum steigt investiertes Kapital bei Umschichtung?", url: "https://www.finanzfluss.de/copilot/hilfe/warum-steigt-investiertes-kapital-bei-umschichtung/" },
+        { title: "Ausgleichsbuchungen", url: "https://www.finanzfluss.de/copilot/hilfe/korrekturbuchungen/" },
+    ],
+    "Budget": [
+        { title: "Budget", url: "https://www.finanzfluss.de/copilot/hilfe/budget/" },
+        { title: "Individuelle Budgets", url: "https://www.finanzfluss.de/copilot/hilfe/individuelle-budgets/" },
+        { title: "Kategorien", url: "https://www.finanzfluss.de/copilot/hilfe/kategorien/" },
+        { title: "Tags", url: "https://www.finanzfluss.de/copilot/hilfe/tags/" },
+    ],
+    "Konto & Sicherheit": [
+        { title: "Wie lösche ich meinen Account?", url: "https://www.finanzfluss.de/copilot/hilfe/account-loeschen/" },
+        { title: "Zwei-Faktor-Authentifizierung (2FA)", url: "https://www.finanzfluss.de/copilot/hilfe/2fa/" },
+        { title: "Sicherheit im Finanzfluss Copilot", url: "https://www.finanzfluss.de/copilot/hilfe/sicherheit-beim-finanzfluss-copilot/" },
+        { title: "Auto-Logout", url: "https://www.finanzfluss.de/copilot/hilfe/auto-logout/" },
+        { title: "Backup-Codes verloren?", url: "https://www.finanzfluss.de/copilot/hilfe/backup-codes-verloren/" },
+        { title: "TAN von deinem Broker erhalten", url: "https://www.finanzfluss.de/copilot/hilfe/keine-tan-vom-broker-erhalten/" },
+        { title: "TAN-Abfrage", url: "https://www.finanzfluss.de/copilot/hilfe/wieso-fordert-dei-bank-eine-tan/" },
     ],
     "Sonstiges": [
-        { title: "Häufig gestellte Fragen", url: "#" },
+        { title: "Copilot Rolle im Discord bekommen", url: "https://www.finanzfluss.de/copilot/hilfe/discord/" },
+        { title: "Feature Request", url: "https://www.finanzfluss.de/copilot/hilfe/feature-request/" },
+        { title: "Kostenlose Probeversion von Copilot PLUS", url: "https://www.finanzfluss.de/copilot/hilfe/probeabonnement/" },
+        { title: "Familienfreigabe", url: "https://www.finanzfluss.de/copilot/hilfe/familienfregabe/" },
+        { title: "Krypto-Transfer von Börse zu Coldwallet", url: "https://www.finanzfluss.de/copilot/hilfe/krypto-transfer-coldwallet/" },
+        { title: "Immobilien im Copilot erfassen", url: "https://www.finanzfluss.de/copilot/hilfe/immobilien-im-copilot-erfassen/" },
+        { title: "Fusionen im Copilot eintragen", url: "https://www.finanzfluss.de/copilot/hilfe/fusionen-im-copilot-eintragen/" },
+        { title: "Kredite im Copilot eintragen", url: "https://www.finanzfluss.de/copilot/hilfe/kredit-im-copilot-richtig-eintragen/" },
+        { title: "Unterschiede Verrechnungskonto Trade Republic", url: "https://www.finanzfluss.de/copilot/hilfe/unterschiedliche-betrage-auf-dem-verechnungskonto-von-tr-und-im-copiloten/" },
+        { title: "Fehlersuche Scalable Capital", url: "https://www.finanzfluss.de/copilot/hilfe/fehlersuche-scalable-capital/" },
+        { title: "Fehlerhafter Datenabgleich flatex/DEGIRO", url: "https://www.finanzfluss.de/copilot/hilfe/fehlerhafter-datenabgleich-flatex-degiro/" },
     ],
 };
 
@@ -111,11 +174,49 @@ export default function ReportPage() {
         <div className="animate-in" style={{ maxWidth: "560px", margin: "0 auto" }}>
             <div style={{ marginBottom: "2rem" }}>
                 <h1 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.02em" }}>
-                    Hilfe & Problem melden
+                    Problem melden
                 </h1>
                 <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "0.25rem" }}>
-                    Wir helfen dir weiter — schau zuerst, ob ein Helpcenter-Artikel dein Problem löst.
+                    Wähle eine Kategorie — vielleicht hilft dir schon ein Artikel aus unserem Helpcenter weiter.
                 </p>
+            </div>
+
+            {/* Step indicator */}
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1.5rem" }}>
+                {["Kategorie", "Helpcenter", "Kontakt"].map((label, i) => {
+                    const stepIndex = i === 0 ? "category" : i === 1 ? "articles" : "contact";
+                    const steps: Step[] = ["category", "articles", "contact"];
+                    const currentIndex = steps.indexOf(step);
+                    const isActive = i <= currentIndex;
+                    return (
+                        <div key={label} style={{ display: "flex", alignItems: "center", gap: "0.5rem", flex: i < 2 ? 1 : undefined }}>
+                            <div
+                                style={{
+                                    width: "1.75rem",
+                                    height: "1.75rem",
+                                    borderRadius: "50%",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    fontSize: "0.75rem",
+                                    fontWeight: 700,
+                                    background: isActive ? "var(--color-primary-500)" : "var(--card-border)",
+                                    color: isActive ? "white" : "var(--muted)",
+                                    transition: "all 0.2s",
+                                    flexShrink: 0,
+                                }}
+                            >
+                                {i + 1}
+                            </div>
+                            <span style={{ fontSize: "0.8125rem", color: isActive ? "var(--foreground)" : "var(--muted)", fontWeight: isActive ? 600 : 400 }}>
+                                {label}
+                            </span>
+                            {i < 2 && (
+                                <div style={{ flex: 1, height: "1px", background: isActive && i < currentIndex ? "var(--color-primary-500)" : "var(--card-border)", margin: "0 0.25rem" }} />
+                            )}
+                        </div>
+                    );
+                })}
             </div>
 
             {/* Step 1: Category */}
@@ -134,19 +235,23 @@ export default function ReportPage() {
                     <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                         {categories.map((cat) => (
                             <button
-                                key={cat}
+                                key={cat.label}
                                 className="btn-secondary"
                                 style={{
                                     justifyContent: "flex-start",
                                     padding: "0.75rem 1rem",
                                     textAlign: "left",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "0.625rem",
                                 }}
                                 onClick={() => {
-                                    setCategory(cat);
+                                    setCategory(cat.label);
                                     setStep("articles");
                                 }}
                             >
-                                {cat}
+                                <span>{cat.icon}</span>
+                                <span>{cat.label}</span>
                             </button>
                         ))}
                     </div>
@@ -178,7 +283,7 @@ export default function ReportPage() {
                         <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginBottom: "1.5rem" }}>
                             {(helpcenterArticles[category] || []).map((article) => (
                                 <a
-                                    key={article.title}
+                                    key={article.url}
                                     href={article.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
@@ -197,7 +302,7 @@ export default function ReportPage() {
                                     className="card"
                                 >
                                     <span>📄 {article.title}</span>
-                                    <span style={{ color: "var(--muted)" }}>→</span>
+                                    <span style={{ color: "var(--muted)" }}>↗</span>
                                 </a>
                             ))}
                         </div>
@@ -210,7 +315,7 @@ export default function ReportPage() {
                             }}
                         >
                             <p style={{ fontSize: "0.8125rem", color: "var(--muted)", marginBottom: "0.75rem" }}>
-                                Das hat dir nicht geholfen?
+                                Das hat dir nicht weitergeholfen?
                             </p>
                             <button
                                 className="btn-primary"
@@ -223,7 +328,7 @@ export default function ReportPage() {
                 </div>
             )}
 
-            {/* Step 3: Contact Form */}
+            {/* Step 3: Contact Form → Intercom */}
             {step === "contact" && (
                 <div>
                     <button
@@ -319,7 +424,7 @@ export default function ReportPage() {
                             </div>
 
                             <button type="submit" className="btn-primary" disabled={loading}>
-                                {loading ? "Wird gesendet..." : "Nachricht senden"}
+                                {loading ? "Wird gesendet..." : "Nachricht an Support senden"}
                             </button>
                         </div>
                     </form>
