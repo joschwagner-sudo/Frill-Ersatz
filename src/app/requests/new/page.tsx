@@ -1,130 +1,253 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function NewRequestPage() {
-    const router = useRouter();
-    const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [topics, setTopics] = useState<
+    { id: string; name: string; emoji: string }[]
+  >([]);
 
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        setLoading(true);
+  useEffect(() => {
+    // Fetch topics
+    fetch("/api/admin/topics")
+      .then((res) => res.json())
+      .then((data) => setTopics(data.topics || []))
+      .catch(console.error);
+  }, []);
 
-        const form = new FormData(e.currentTarget);
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
 
-        let userId = "";
-        try {
-            const sessionRes = await fetch("/api/auth/session");
-            const sessionData = await sessionRes.json();
-            if (sessionData.user?.userId) {
-                userId = sessionData.user.userId;
-            } else {
-                alert("Bitte melde dich an, um einen Vorschlag einzureichen.");
-                router.push("/login");
-                return;
-            }
-        } catch {
-            alert("Bitte melde dich zuerst an.");
-            router.push("/login");
-            return;
-        }
+    const form = new FormData(e.currentTarget);
 
-        try {
-            const res = await fetch("/api/requests", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    title: form.get("title"),
-                    description: form.get("description"),
-                    type: form.get("type"),
-                    tags: form.get("tags"),
-                    userId,
-                }),
-            });
-
-            if (res.ok) {
-                const data = await res.json();
-                router.push(`/requests/${data.id}`);
-            } else if (res.status === 429) {
-                alert("Du kannst maximal 3 Vorschläge pro Tag einreichen.");
-            } else {
-                const data = await res.json();
-                alert(data.error || "Fehler beim Einreichen");
-            }
-        } catch {
-            alert("Netzwerkfehler");
-        } finally {
-            setLoading(false);
-        }
+    let userId = "";
+    try {
+      const sessionRes = await fetch("/api/auth/session");
+      const sessionData = await sessionRes.json();
+      if (sessionData.user?.userId) {
+        userId = sessionData.user.userId;
+      } else {
+        alert("Bitte melde dich an, um einen Vorschlag einzureichen.");
+        router.push("/login");
+        return;
+      }
+    } catch {
+      alert("Bitte melde dich zuerst an.");
+      router.push("/login");
+      return;
     }
 
-    return (
-        <div className="animate-in" style={{ maxWidth: "560px", margin: "0 auto" }}>
-            <div style={{ marginBottom: "2rem" }}>
-                <h1 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.02em" }}>
-                    Idee einreichen
-                </h1>
-                <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "0.25rem" }}>
-                    Teile deinen Vorschlag oder melde einen Bug
-                </p>
-            </div>
+    const topicId = form.get("topic");
+    if (!topicId) {
+      alert("Bitte wähle ein Topic aus.");
+      setLoading(false);
+      return;
+    }
 
-            <form onSubmit={handleSubmit} className="card" style={{ padding: "1.5rem" }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-                    {/* Type */}
-                    <div>
-                        <label style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, marginBottom: "0.375rem" }}>
-                            Art
-                        </label>
-                        <div style={{ display: "flex", gap: "0.5rem" }}>
-                            {["FEATURE", "BUG"].map((t) => (
-                                <label
-                                    key={t}
-                                    style={{
-                                        flex: 1, display: "flex", alignItems: "center", justifyContent: "center",
-                                        gap: "0.375rem", padding: "0.5rem", border: "1px solid var(--input-border)",
-                                        borderRadius: "8px", cursor: "pointer", fontSize: "0.875rem", fontWeight: 500,
-                                    }}
-                                >
-                                    <input type="radio" name="type" value={t} defaultChecked={t === "FEATURE"}
-                                        style={{ accentColor: "var(--color-primary-600)" }} />
-                                    {t === "FEATURE" ? "💡 Neue Idee" : "🐛 Bug"}
-                                </label>
-                            ))}
-                        </div>
-                    </div>
+    try {
+      const res = await fetch("/api/requests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: form.get("title"),
+          description: form.get("description"),
+          topicId,
+          userId,
+        }),
+      });
 
-                    {/* Title */}
-                    <div>
-                        <label htmlFor="title" style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, marginBottom: "0.375rem" }}>
-                            Titel <span style={{ fontWeight: 400, color: "var(--muted)" }}>(max. 80 Zeichen)</span>
-                        </label>
-                        <input id="title" name="title" type="text" required maxLength={80} placeholder="Kurze Zusammenfassung..." className="input" />
-                    </div>
+      if (res.ok) {
+        const data = await res.json();
+        router.push(`/requests/${data.id}`);
+      } else if (res.status === 429) {
+        alert("Du kannst maximal 3 Vorschläge pro Tag einreichen.");
+      } else {
+        const data = await res.json();
+        alert(data.error || "Fehler beim Einreichen");
+      }
+    } catch {
+      alert("Netzwerkfehler");
+    } finally {
+      setLoading(false);
+    }
+  }
 
-                    {/* Description */}
-                    <div>
-                        <label htmlFor="description" style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, marginBottom: "0.375rem" }}>
-                            Beschreibung <span style={{ fontWeight: 400, color: "var(--muted)" }}>(Markdown möglich)</span>
-                        </label>
-                        <textarea id="description" name="description" required rows={6} placeholder="Beschreibe deine Idee oder den Bug im Detail..."
-                            className="input" style={{ resize: "vertical" }} />
-                    </div>
+  return (
+    <div className="animate-in" style={{ maxWidth: "560px", margin: "0 auto" }}>
+      <div style={{ marginBottom: "2rem" }}>
+        <h1
+          style={{
+            fontSize: "1.875rem",
+            fontWeight: 700,
+            letterSpacing: "-0.02em",
+          }}
+        >
+          Idee einreichen
+        </h1>
+        <p
+          style={{
+            fontSize: "0.9375rem",
+            color: "var(--muted)",
+            marginTop: "0.5rem",
+          }}
+        >
+          Teile deinen Feature-Vorschlag mit uns. Nach Prüfung wird deine Idee
+          für alle sichtbar.
+        </p>
+        <p
+          style={{
+            fontSize: "0.875rem",
+            color: "var(--muted)",
+            marginTop: "0.5rem",
+            padding: "0.75rem",
+            background: "var(--accent-bg)",
+            borderRadius: "8px",
+            border: "1px solid var(--card-border)",
+          }}
+        >
+          🐛 Bugs bitte{" "}
+          <a
+            href="/report"
+            style={{
+              color: "var(--color-primary-600)",
+              textDecoration: "underline",
+            }}
+          >
+            über den Bug-Report
+          </a>{" "}
+          melden, nicht hier.
+        </p>
+      </div>
 
-                    {/* Tags */}
-                    <div>
-                        <label htmlFor="tags" style={{ display: "block", fontSize: "0.8125rem", fontWeight: 600, marginBottom: "0.375rem" }}>
-                            Tags <span style={{ fontWeight: 400, color: "var(--muted)" }}>(kommagetrennt, optional)</span>
-                        </label>
-                        <input id="tags" name="tags" type="text" placeholder="ui, performance, api" className="input" />
-                    </div>
+      <form
+        onSubmit={handleSubmit}
+        className="card"
+        style={{ padding: "1.5rem" }}
+      >
+        <div
+          style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}
+        >
+          {/* Topic Selection (Required) */}
+          <div>
+            <label
+              htmlFor="topic"
+              style={{
+                display: "block",
+                fontSize: "0.875rem",
+                fontWeight: 600,
+                marginBottom: "0.5rem",
+              }}
+            >
+              Topic{" "}
+              <span style={{ color: "var(--color-primary-600)" }}>*</span>
+            </label>
+            <select
+              id="topic"
+              name="topic"
+              required
+              className="input"
+              style={{
+                cursor: "pointer",
+                appearance: "none",
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L2 4h8z'/%3E%3C/svg%3E")`,
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "right 0.75rem center",
+                paddingRight: "2.5rem",
+              }}
+            >
+              <option value="">— Bitte wählen —</option>
+              {topics.map((topic) => (
+                <option key={topic.id} value={topic.id}>
+                  {topic.emoji} {topic.name}
+                </option>
+              ))}
+            </select>
+          </div>
 
-                    <button type="submit" className="btn-primary" disabled={loading}>
-                        {loading ? "Wird eingereicht..." : "Vorschlag einreichen"}
-                    </button>
-                </div>
-            </form>
+          {/* Title */}
+          <div>
+            <label
+              htmlFor="title"
+              style={{
+                display: "block",
+                fontSize: "0.875rem",
+                fontWeight: 600,
+                marginBottom: "0.5rem",
+              }}
+            >
+              Titel{" "}
+              <span style={{ color: "var(--color-primary-600)" }}>*</span>
+              <span
+                style={{ fontWeight: 400, color: "var(--muted)", marginLeft: "0.25rem" }}
+              >
+                (max. 80 Zeichen)
+              </span>
+            </label>
+            <input
+              id="title"
+              name="title"
+              type="text"
+              required
+              maxLength={80}
+              placeholder="z.B. CSV-Import für Transaktionen"
+              className="input"
+            />
+          </div>
+
+          {/* Description */}
+          <div>
+            <label
+              htmlFor="description"
+              style={{
+                display: "block",
+                fontSize: "0.875rem",
+                fontWeight: 600,
+                marginBottom: "0.5rem",
+              }}
+            >
+              Beschreibung{" "}
+              <span style={{ color: "var(--color-primary-600)" }}>*</span>
+              <span
+                style={{ fontWeight: 400, color: "var(--muted)", marginLeft: "0.25rem" }}
+              >
+                (Markdown möglich)
+              </span>
+            </label>
+            <textarea
+              id="description"
+              name="description"
+              required
+              rows={8}
+              placeholder="Beschreibe deine Idee im Detail. Was möchtest du erreichen? Warum wäre das hilfreich?"
+              className="input"
+              style={{ resize: "vertical" }}
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="btn-primary"
+            disabled={loading}
+            style={{ fontSize: "0.9375rem", padding: "0.75rem 1.5rem" }}
+          >
+            {loading ? "Wird eingereicht..." : "Idee einreichen"}
+          </button>
+
+          <p
+            style={{
+              fontSize: "0.75rem",
+              color: "var(--muted-foreground)",
+              textAlign: "center",
+            }}
+          >
+            Deine Idee wird nach Prüfung durch unser Team veröffentlicht.
+          </p>
         </div>
-    );
+      </form>
+    </div>
+  );
 }

@@ -17,11 +17,12 @@ model User {
   createdAt   DateTime @default(now())
   lastLoginAt DateTime?
 
-  createdRequests  FeatureRequest[] @relation("CreatedRequests")
-  votes            Vote[]
-  comments         Comment[]
-  announcements    Announcement[]
-  emailLogs        AnnouncementEmailLog[]
+  createdRequests       FeatureRequest[]       @relation("CreatedRequests")
+  votes                 Vote[]
+  comments              Comment[]
+  announcements         Announcement[]
+  emailLogs             AnnouncementEmailLog[]
+  announcementReactions AnnouncementReaction[]
 }
 
 // ─── Auth Code (Magic Link 6-digit) ───────────────────
@@ -111,9 +112,14 @@ model Announcement {
   createdById String
   createdBy   User @relation(fields: [createdById], references: [id])
 
+  categoryId  String?
+  category    AnnouncementCategory? @relation("AnnouncementCategory", fields: [categoryId], references: [id])
+
   emailLogs   AnnouncementEmailLog[]
+  reactions   AnnouncementReaction[]
 
   @@index([publishedAt])
+  @@index([categoryId])
 }
 
 // ─── Announcement Email Log ───────────────────────────
@@ -130,6 +136,33 @@ model AnnouncementEmailLog {
   user           User @relation(fields: [userId], references: [id])
 
   @@index([announcementId])
+}
+
+// ─── Announcement Category ────────────────────────────
+model AnnouncementCategory {
+  id            String         @id @default(cuid())
+  name          String         @unique
+  color         String         // hex color
+  emoji         String         @default("")
+  createdAt     DateTime       @default(now())
+  announcements Announcement[] @relation("AnnouncementCategory")
+}
+
+// ─── Announcement Reaction ────────────────────────────
+model AnnouncementReaction {
+  id             String       @id @default(cuid())
+  emoji          String       // 🔥 ❤️ 👍
+  createdAt      DateTime     @default(now())
+
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+
+  announcementId String
+  announcement   Announcement @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, announcementId, emoji])
+  @@index([announcementId])
+  @@index([userId])
 }
 
 // ─── Report to Intercom ───────────────────────────────

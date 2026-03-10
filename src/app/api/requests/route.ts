@@ -41,16 +41,23 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const result = FeatureRequestSchema.safeParse(body);
+        
+        // Simplified validation for now - just check required fields
+        const { title, description, topicId, userId } = body;
 
-        if (!result.success) {
+        if (!title || !description || !topicId || !userId) {
             return NextResponse.json(
-                { error: result.error.issues[0].message },
+                { error: "Missing required fields: title, description, topicId, userId" },
                 { status: 400 }
             );
         }
 
-        const { title, description, type, tags, userId } = result.data;
+        if (title.length > 80) {
+            return NextResponse.json(
+                { error: "Title must be 80 characters or less" },
+                { status: 400 }
+            );
+        }
 
         // Rate limit: max 3 requests/day/user (Europe/Berlin timezone)
         const now = new Date();
@@ -74,13 +81,26 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Create feature request with topic
         const featureRequest = await prisma.featureRequest.create({
             data: {
                 title,
                 description,
-                type: type || "FEATURE",
-                tags: tags || "",
+                type: "FEATURE", // Always FEATURE for ideas (bugs go to /report)
+                approvalStatus: "NEEDS_APPROVAL", // Default, will be approved by admin
                 createdById: userId,
+                topics: {
+                    create: {
+                        topicId,
+                    },
+                },
+            },
+            include: {
+                topics: {
+                    include: {
+                        topic: true,
+                    },
+                },
             },
         });
 
