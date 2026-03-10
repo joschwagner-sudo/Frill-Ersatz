@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import DuplicateSuggestions from "@/components/DuplicateSuggestions";
 
 export default function NewRequestPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [title, setTitle] = useState("");
   const [topics, setTopics] = useState<
     { id: string; name: string; emoji: string }[]
   >([]);
@@ -195,7 +197,10 @@ export default function NewRequestPage() {
               maxLength={80}
               placeholder="z.B. CSV-Import für Transaktionen"
               className="input"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
+            <DuplicateSuggestions title={title} />
           </div>
 
           {/* Description */}

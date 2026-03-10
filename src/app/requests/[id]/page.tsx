@@ -2,11 +2,59 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
+import type { Metadata } from "next";
 import Markdown from "@/components/Markdown";
 import CommentSection from "@/components/CommentSection";
 import VoteButton from "@/components/VoteButton";
+import ShareButton from "@/components/ShareButton";
 
 export const dynamic = "force-dynamic";
+
+// Generate Open Graph metadata
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+
+  const request = await prisma.featureRequest.findUnique({
+    where: { id },
+    select: {
+      title: true,
+      description: true,
+      number: true,
+    },
+  });
+
+  if (!request) {
+    return {
+      title: "Idee nicht gefunden",
+    };
+  }
+
+  const truncatedDesc =
+    request.description.length > 160
+      ? request.description.slice(0, 157) + "..."
+      : request.description;
+
+  return {
+    title: `${request.title} — Copilot Feedback`,
+    description: truncatedDesc,
+    openGraph: {
+      title: request.title,
+      description: truncatedDesc,
+      type: "website",
+      url: `https://copilot-feedback.vercel.app/requests/${id}`,
+      siteName: "Copilot Feedback",
+    },
+    twitter: {
+      card: "summary",
+      title: request.title,
+      description: truncatedDesc,
+    },
+  };
+}
 
 const statusConfig: Record<
   string,
@@ -16,6 +64,7 @@ const statusConfig: Record<
   PLANNED: { label: "To Do", emoji: "📋", class: "badge-planned" },
   IN_PROGRESS: { label: "In Arbeit", emoji: "🧑‍💻", class: "badge-progress" },
   DONE: { label: "Erledigt", emoji: "🎉", class: "badge-done" },
+  MERGED: { label: "Zusammengeführt", emoji: "🔀", class: "badge-merged" },
 };
 
 async function getCurrentUser() {
@@ -52,6 +101,7 @@ export default async function RequestDetailPage({
         },
       },
       roadmapItem: true,
+      mergedInto: { select: { id: true, number: true, title: true } },
       _count: { select: { votes: true } },
     },
   });
@@ -87,6 +137,43 @@ export default async function RequestDetailPage({
       >
         ← Zurück zu Ideen
       </Link>
+
+      {/* Merged notice */}
+      {request.mergedInto && (
+        <div
+          style={{
+            padding: "1rem",
+            background: "#dbeafe",
+            border: "2px solid var(--color-primary-600)",
+            borderRadius: "8px",
+            marginBottom: "1.5rem",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              color: "var(--color-primary-600)",
+              marginBottom: "0.375rem",
+            }}
+          >
+            🔀 Diese Idee wurde zusammengeführt
+          </div>
+          <div style={{ fontSize: "0.875rem" }}>
+            Diese Idee ist jetzt Teil von{" "}
+            <Link
+              href={`/requests/${request.mergedInto.id}`}
+              style={{
+                color: "var(--color-primary-600)",
+                fontWeight: 600,
+                textDecoration: "underline",
+              }}
+            >
+              #{request.mergedInto.number} {request.mergedInto.title}
+            </Link>
+          </div>
+        </div>
+      )}
 
       <div className="card" style={{ padding: "1.5rem" }}>
         {/* Header */}
@@ -157,25 +244,36 @@ export default async function RequestDetailPage({
           </div>
         </div>
 
-        {/* Roadmap badge */}
-        {request.roadmapItem && (
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.375rem",
-              padding: "0.5rem 0.875rem",
-              background: "#dbeafe",
-              borderRadius: "8px",
-              fontSize: "0.875rem",
-              fontWeight: 500,
-              color: "var(--color-primary-600)",
-              marginBottom: "1.25rem",
-            }}
-          >
-            🗺️ Auf der Roadmap — {request.roadmapItem.quarter}
-          </div>
-        )}
+        {/* Roadmap badge + Share buttons */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "1.25rem",
+            flexWrap: "wrap",
+            gap: "1rem",
+          }}
+        >
+          {request.roadmapItem && (
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.375rem",
+                padding: "0.5rem 0.875rem",
+                background: "#dbeafe",
+                borderRadius: "8px",
+                fontSize: "0.875rem",
+                fontWeight: 500,
+                color: "var(--color-primary-600)",
+              }}
+            >
+              🗺️ Auf der Roadmap — {request.roadmapItem.quarter}
+            </div>
+          )}
+          <ShareButton ideaId={request.id} title={request.title} />
+        </div>
 
         {/* Description */}
         <div

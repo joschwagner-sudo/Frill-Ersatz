@@ -11,11 +11,12 @@ datasource db {
 
 // ─── User ──────────────────────────────────────────────
 model User {
-  id          String   @id @default(cuid())
-  email       String   @unique
-  isAdmin     Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  lastLoginAt DateTime?
+  id                 String   @id @default(cuid())
+  email              String   @unique
+  isAdmin            Boolean  @default(false)
+  emailNotifications Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  lastLoginAt        DateTime?
 
   createdRequests       FeatureRequest[]       @relation("CreatedRequests")
   votes                 Vote[]
@@ -23,6 +24,7 @@ model User {
   announcements         Announcement[]
   emailLogs             AnnouncementEmailLog[]
   announcementReactions AnnouncementReaction[]
+  notifications         Notification[]
 }
 
 // ─── Auth Code (Magic Link 6-digit) ───────────────────
@@ -44,13 +46,14 @@ model FeatureRequest {
   title          String   // max 80 chars (validated in app)
   description    String   // markdown
   type           String   @default("FEATURE") // FEATURE | BUG
-  status         String?  // UNDER_REVIEW | PLANNED | IN_PROGRESS | DONE | NOT_PLANNED
+  status         String?  // UNDER_REVIEW | PLANNED | IN_PROGRESS | DONE | NOT_PLANNED | MERGED
   approvalStatus String   @default("NEEDS_APPROVAL") // NEEDS_APPROVAL | APPROVED | REJECTED
   isPinned       Boolean  @default(false)
   isPrivate      Boolean  @default(false)
   isShortlisted  Boolean  @default(false)
   tags           String   @default("") // comma-separated for SQLite simplicity
   archived       Boolean  @default(false)
+  mergedIntoId   String?  // If merged, points to target idea
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -61,12 +64,15 @@ model FeatureRequest {
   comments    Comment[]
   roadmapItem RoadmapItem?
   topics      IdeaTopics[]
+  mergedInto  FeatureRequest?  @relation("MergedIdeas", fields: [mergedIntoId], references: [id], onDelete: SetNull)
+  mergedFrom  FeatureRequest[] @relation("MergedIdeas")
 
   @@index([createdById])
   @@index([type])
   @@index([status])
   @@index([approvalStatus])
   @@index([number])
+  @@index([mergedIntoId])
 }
 
 // ─── Vote ─────────────────────────────────────────────
@@ -182,6 +188,7 @@ model ReportToIntercom {
 model Comment {
   id               String         @id @default(cuid())
   body             String
+  isOfficial       Boolean        @default(false)
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 
@@ -218,4 +225,21 @@ model IdeaTopics {
   @@unique([featureRequestId, topicId])
   @@index([featureRequestId])
   @@index([topicId])
+}
+
+// ─── Notification ─────────────────────────────────────
+model Notification {
+  id        String   @id @default(cuid())
+  type      String   // IDEA_APPROVED | STATUS_CHANGED | NEW_COMMENT
+  message   String
+  read      Boolean  @default(false)
+  ideaId    String?
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
 }

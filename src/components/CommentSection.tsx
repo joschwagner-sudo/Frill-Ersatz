@@ -5,8 +5,9 @@ import { useState, useEffect } from "react";
 type Comment = {
     id: string;
     body: string;
+    isOfficial: boolean;
     createdAt: string;
-    user: { email: string };
+    user: { email: string; isAdmin: boolean };
 };
 
 export default function CommentSection({
@@ -67,11 +68,38 @@ export default function CommentSection({
                     <div style={{ color: "var(--muted)", fontSize: "0.875rem" }}>Noch keine Kommentare. Starte die Diskussion!</div>
                 ) : (
                     comments.map((comment) => (
-                        <div key={comment.id} className="card" style={{ padding: "0.75rem 1rem", background: "var(--accent-bg)" }}>
-                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem", fontSize: "0.75rem" }}>
-                                <span style={{ fontWeight: 600, color: "var(--color-primary-600)" }}>
-                                    {comment.user.email.split("@")[0]}
-                                </span>
+                        <div
+                            key={comment.id}
+                            className="card"
+                            style={{
+                                padding: "0.75rem 1rem",
+                                background: comment.isOfficial ? "#eff6ff" : "var(--accent-bg)",
+                                borderLeft: comment.isOfficial ? "4px solid var(--color-primary-600)" : "none",
+                            }}
+                        >
+                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem", fontSize: "0.75rem", alignItems: "center" }}>
+                                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                                    <span style={{ fontWeight: 600, color: "var(--color-primary-600)" }}>
+                                        {comment.user.email.split("@")[0]}
+                                    </span>
+                                    {comment.isOfficial && (
+                                        <span
+                                            style={{
+                                                display: "inline-flex",
+                                                alignItems: "center",
+                                                gap: "0.25rem",
+                                                background: "var(--color-primary-600)",
+                                                color: "white",
+                                                padding: "0.125rem 0.5rem",
+                                                borderRadius: "9999px",
+                                                fontSize: "0.6875rem",
+                                                fontWeight: 600,
+                                            }}
+                                        >
+                                            ⭐ Finanzfluss Team
+                                        </span>
+                                    )}
+                                </div>
                                 <span style={{ color: "var(--muted)" }}>
                                     {new Date(comment.createdAt).toLocaleString("de-DE")}
                                 </span>

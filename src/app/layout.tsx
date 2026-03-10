@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { cookies } from "next/headers";
+import UserNav from "@/components/UserNav";
 import "./globals.css";
 
 const geistMono = Geist_Mono({
@@ -135,32 +136,7 @@ export default async function RootLayout({
             </nav>
 
             {/* Account / Login */}
-            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              {userId ? (
-                <Link
-                  href="/account"
-                  className="btn-secondary"
-                  style={{
-                    padding: "0.5rem 1rem",
-                    fontSize: "0.875rem",
-                  }}
-                >
-                  <span>👤</span>
-                  <span className="hidden sm:inline">Mein Bereich</span>
-                </Link>
-              ) : (
-                <Link
-                  href="/login"
-                  className="btn-primary"
-                  style={{
-                    padding: "0.5rem 1rem",
-                    fontSize: "0.875rem",
-                  }}
-                >
-                  Anmelden
-                </Link>
-              )}
-            </div>
+            <UserNav hasUser={!!userId} />
           </div>
         </header>
 

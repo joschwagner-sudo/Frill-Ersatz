@@ -38,6 +38,24 @@ export async function PATCH(
       data: { status },
     });
 
+    // Create notification for idea creator
+    const statusLabels: Record<string, string> = {
+      UNDER_REVIEW: "In Prüfung 🔎",
+      PLANNED: "To Do 📋",
+      IN_PROGRESS: "In Arbeit 🧑‍💻",
+      DONE: "Erledigt 🎉",
+      NOT_PLANNED: "Nicht geplant",
+    };
+
+    await prisma.notification.create({
+      data: {
+        userId: idea.createdById,
+        type: "STATUS_CHANGED",
+        message: `Der Status deiner Idee "${idea.title}" wurde auf "${statusLabels[status]}" geändert.`,
+        ideaId: idea.id,
+      },
+    });
+
     return NextResponse.json({ success: true, idea });
   } catch (error) {
     console.error("Failed to update status:", error);

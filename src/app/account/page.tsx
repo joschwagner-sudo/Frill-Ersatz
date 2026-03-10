@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import EmailNotificationToggle from "@/components/EmailNotificationToggle";
 
 export const dynamic = "force-dynamic";
 
@@ -395,6 +396,25 @@ export default async function AccountPage() {
             })}
           </div>
         )}
+      </section>
+
+      {/* Settings */}
+      <section style={{ marginBottom: "2.5rem" }}>
+        <h2
+          style={{
+            fontSize: "1.25rem",
+            fontWeight: 700,
+            marginBottom: "1rem",
+          }}
+        >
+          ⚙️ Einstellungen
+        </h2>
+        <div className="card" style={{ padding: "1.5rem" }}>
+          <EmailNotificationToggle
+            initialValue={user.emailNotifications}
+            userId={user.id}
+          />
+        </div>
       </section>
     </div>
   );

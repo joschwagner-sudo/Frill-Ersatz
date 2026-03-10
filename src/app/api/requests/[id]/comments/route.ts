@@ -35,16 +35,35 @@ export async function POST(
             return NextResponse.json({ error: "Feature request not found" }, { status: 404 });
         }
 
+        // Check if user is admin
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { isAdmin: true },
+        });
+
         const comment = await prisma.comment.create({
             data: {
                 body: commentBody,
                 userId,
                 featureRequestId,
+                isOfficial: user?.isAdmin || false,
             },
             include: {
-                user: { select: { email: true } },
+                user: { select: { email: true, isAdmin: true } },
             },
         });
+
+        // Create notification for idea creator (if not commenting on own idea)
+        if (fr.createdById !== userId) {
+            await prisma.notification.create({
+                data: {
+                    userId: fr.createdById,
+                    type: "NEW_COMMENT",
+                    message: `Jemand hat deine Idee "${fr.title}" kommentiert.`,
+                    ideaId: fr.id,
+                },
+            });
+        }
 
         return NextResponse.json(comment, { status: 201 });
     } catch (error) {
@@ -64,7 +83,7 @@ export async function GET(
         const comments = await prisma.comment.findMany({
             where: { featureRequestId },
             include: {
-                user: { select: { email: true } },
+                user: { select: { email: true, isAdmin: true } },
             },
             orderBy: { createdAt: "asc" },
         });

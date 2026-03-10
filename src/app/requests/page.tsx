@@ -76,6 +76,10 @@ export default async function RequestsPage({
     };
   }
 
+  // For trending: calculate votes in last 7 days
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
   const requests = await prisma.featureRequest.findMany({
     where,
     include: {
@@ -93,8 +97,42 @@ export default async function RequestsPage({
         ? { votes: { _count: "desc" } }
         : sort === "oldest"
           ? { createdAt: "asc" }
-          : { createdAt: "desc" },
+          : sort === "trending"
+            ? { createdAt: "desc" } // We'll sort client-side for trending
+            : { createdAt: "desc" },
   });
+
+  // Calculate trending votes if needed
+  let requestsWithTrending: (typeof requests[0] & { recentVoteCount?: number })[] = requests;
+  if (sort === "trending" || !sort) {
+    // Get recent vote counts for all ideas
+    const recentVotes = await prisma.vote.groupBy({
+      by: ["featureRequestId"],
+      where: {
+        createdAt: {
+          gte: sevenDaysAgo,
+        },
+        featureRequestId: {
+          in: requests.map((r) => r.id),
+        },
+      },
+      _count: true,
+    });
+
+    const recentVoteMap = new Map(
+      recentVotes.map((v) => [v.featureRequestId, v._count])
+    );
+
+    requestsWithTrending = requests.map((r) => ({
+      ...r,
+      recentVoteCount: recentVoteMap.get(r.id) || 0,
+    }));
+
+    // Sort by trending if selected
+    if (sort === "trending") {
+      requestsWithTrending.sort((a, b) => (b.recentVoteCount || 0) - (a.recentVoteCount || 0));
+    }
+  }
 
   return (
     <div className="animate-in">
@@ -124,8 +162,8 @@ export default async function RequestsPage({
               marginTop: "0.25rem",
             }}
           >
-            {requests.length}{" "}
-            {requests.length === 1 ? "Vorschlag" : "Vorschläge"}
+            {requestsWithTrending.length}{" "}
+            {requestsWithTrending.length === 1 ? "Vorschlag" : "Vorschläge"}
           </p>
         </div>
         <Link href="/requests/new" className="btn-primary">
@@ -237,6 +275,7 @@ export default async function RequestsPage({
         <div style={{ display: "flex", gap: "0.25rem" }}>
           {[
             { value: "newest", label: "Neueste" },
+            { value: "trending", label: "🔥 Im Trend" },
             { value: "votes", label: "Meiste Stimmen" },
           ].map((s) => (
             <Link
@@ -262,7 +301,7 @@ export default async function RequestsPage({
 
       {/* Request List */}
       <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-        {requests.length === 0 ? (
+        {requestsWithTrending.length === 0 ? (
           <div
             className="card"
             style={{
@@ -275,10 +314,11 @@ export default async function RequestsPage({
             <p>Keine Vorschläge gefunden</p>
           </div>
         ) : (
-          requests.map((req) => {
+          requestsWithTrending.map((req) => {
             const hasVoted = userId
               ? (req.votes as { userId: string }[]).length > 0
               : false;
+            const isTrending = (req.recentVoteCount || 0) >= 5;
 
             return (
               <div
@@ -323,6 +363,18 @@ export default async function RequestsPage({
                     >
                       {req.title}
                     </h3>
+                    {isTrending && (
+                      <span
+                        style={{
+                          fontSize: "0.875rem",
+                          color: "#f97316",
+                          fontWeight: 600,
+                        }}
+                        title={`${req.recentVoteCount || 0} Stimmen in den letzten 7 Tagen`}
+                      >
+                        🔥
+                      </span>
+                    )}
                     {req.topics.map((t) => (
                       <span key={t.id} className="badge badge-topic">
                         {t.topic.emoji} {t.topic.name}

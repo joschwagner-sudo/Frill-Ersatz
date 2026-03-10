@@ -34,6 +34,16 @@ export async function POST(
       },
     });
 
+    // Create notification for idea creator
+    await prisma.notification.create({
+      data: {
+        userId: idea.createdById,
+        type: "IDEA_APPROVED",
+        message: `Deine Idee "${idea.title}" wurde freigegeben und ist jetzt öffentlich sichtbar!`,
+        ideaId: idea.id,
+      },
+    });
+
     return NextResponse.json({ success: true, idea });
   } catch (error) {
     console.error("Failed to approve idea:", error);

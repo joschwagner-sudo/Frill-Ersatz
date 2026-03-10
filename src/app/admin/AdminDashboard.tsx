@@ -68,6 +68,8 @@ export default function AdminDashboard({
   const [announcements, setAnnouncements] = useState(initialAnnouncements);
   const [stats, setStats] = useState(initialStats);
   const [loading, setLoading] = useState<string | null>(null);
+  const [mergeSourceId, setMergeSourceId] = useState<string | null>(null);
+  const [mergeTargetId, setMergeTargetId] = useState<string>("");
 
   const handleApprove = async (id: string) => {
     setLoading(id);
@@ -173,6 +175,41 @@ export default function AdminDashboard({
     }
   };
 
+  const handleMerge = async () => {
+    if (!mergeSourceId || !mergeTargetId) {
+      alert("Bitte wähle eine Ziel-Idee aus");
+      return;
+    }
+
+    if (!confirm("Bist du sicher? Diese Aktion kann nicht rückgängig gemacht werden.")) {
+      return;
+    }
+
+    setLoading(mergeSourceId);
+    try {
+      const res = await fetch(`/api/admin/ideas/${mergeSourceId}/merge`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ targetId: mergeTargetId }),
+      });
+
+      if (res.ok) {
+        alert("Ideen erfolgreich zusammengeführt");
+        setMergeSourceId(null);
+        setMergeTargetId("");
+        window.location.reload(); // Simple reload to refresh data
+      } else {
+        const data = await res.json();
+        alert(data.error || "Fehler beim Zusammenführen");
+      }
+    } catch (error) {
+      console.error("Failed to merge:", error);
+      alert("Fehler beim Zusammenführen");
+    } finally {
+      setLoading(null);
+    }
+  };
+
   const getStatusBadge = (status: string | null) => {
     if (!status) return <span className="badge" style={{ background: "#f3f4f6", color: "#6b7280" }}>Kein Status</span>;
     const statusMap: Record<string, { label: string; color: string }> = {
@@ -221,12 +258,23 @@ export default function AdminDashboard({
   return (
     <div className="animate-in">
       <div style={{ marginBottom: "2rem" }}>
-        <h1 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.02em" }}>
-          Admin Dashboard
-        </h1>
-        <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "0.25rem" }}>
-          Verwalte Vorschläge, Ankündigungen und Nutzer
-        </p>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div>
+            <h1 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.02em" }}>
+              Admin Dashboard
+            </h1>
+            <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "0.25rem" }}>
+              Verwalte Vorschläge, Ankündigungen und Nutzer
+            </p>
+          </div>
+          <Link
+            href="/admin/analytics"
+            className="btn-primary"
+            style={{ fontSize: "0.875rem", padding: "0.5rem 1rem", textDecoration: "none" }}
+          >
+            📊 Analytics
+          </Link>
+        </div>
       </div>
 
       {/* Stats */}
@@ -418,26 +466,38 @@ export default function AdminDashboard({
                       </div>
                     </td>
                     <td style={{ padding: "0.75rem", textAlign: "right" }}>
-                      {idea.approvalStatus === "NEEDS_APPROVAL" && (
-                        <div style={{ display: "flex", gap: "0.25rem", justifyContent: "flex-end" }}>
+                      <div style={{ display: "flex", gap: "0.25rem", justifyContent: "flex-end", flexWrap: "wrap" }}>
+                        {idea.approvalStatus === "NEEDS_APPROVAL" && (
+                          <>
+                            <button
+                              onClick={() => handleApprove(idea.id)}
+                              disabled={loading === idea.id}
+                              className="btn-primary"
+                              style={{ padding: "0.25rem 0.5rem", fontSize: "0.75rem" }}
+                            >
+                              ✅ Freigeben
+                            </button>
+                            <button
+                              onClick={() => handleReject(idea.id)}
+                              disabled={loading === idea.id}
+                              className="btn-secondary"
+                              style={{ padding: "0.25rem 0.5rem", fontSize: "0.75rem" }}
+                            >
+                              ❌ Ablehnen
+                            </button>
+                          </>
+                        )}
+                        {idea.approvalStatus === "APPROVED" && (
                           <button
-                            onClick={() => handleApprove(idea.id)}
-                            disabled={loading === idea.id}
-                            className="btn-primary"
-                            style={{ padding: "0.25rem 0.5rem", fontSize: "0.75rem" }}
-                          >
-                            ✅ Freigeben
-                          </button>
-                          <button
-                            onClick={() => handleReject(idea.id)}
+                            onClick={() => setMergeSourceId(idea.id)}
                             disabled={loading === idea.id}
                             className="btn-secondary"
                             style={{ padding: "0.25rem 0.5rem", fontSize: "0.75rem" }}
                           >
-                            ❌ Ablehnen
+                            🔀 Zusammenführen
                           </button>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -543,6 +603,89 @@ export default function AdminDashboard({
               <p>Keine Nutzer gefunden</p>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Merge Modal */}
+      {mergeSourceId && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+          }}
+          onClick={() => setMergeSourceId(null)}
+        >
+          <div
+            className="card"
+            style={{
+              padding: "1.5rem",
+              maxWidth: "500px",
+              width: "90%",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ fontSize: "1.125rem", fontWeight: 700, marginBottom: "1rem" }}>
+              🔀 Idee zusammenführen
+            </h3>
+            <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginBottom: "1rem" }}>
+              Wähle die Ziel-Idee aus, in die diese Idee zusammengeführt werden soll. Alle Votes
+              und Kommentare werden übertragen.
+            </p>
+            <div style={{ marginBottom: "1rem" }}>
+              <label
+                htmlFor="mergeTarget"
+                style={{
+                  display: "block",
+                  fontSize: "0.875rem",
+                  fontWeight: 600,
+                  marginBottom: "0.5rem",
+                }}
+              >
+                Ziel-Idee (ID oder Nummer)
+              </label>
+              <select
+                id="mergeTarget"
+                value={mergeTargetId}
+                onChange={(e) => setMergeTargetId(e.target.value)}
+                className="input"
+                style={{ width: "100%" }}
+              >
+                <option value="">— Bitte wählen —</option>
+                {filteredIdeas
+                  .filter((i) => i.id !== mergeSourceId && i.approvalStatus === "APPROVED")
+                  .map((idea) => (
+                    <option key={idea.id} value={idea.id}>
+                      #{idea.number} {idea.title}
+                    </option>
+                  ))}
+              </select>
+            </div>
+            <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
+              <button
+                onClick={() => setMergeSourceId(null)}
+                className="btn-secondary"
+                style={{ padding: "0.5rem 1rem", fontSize: "0.875rem" }}
+              >
+                Abbrechen
+              </button>
+              <button
+                onClick={handleMerge}
+                className="btn-primary"
+                disabled={!mergeTargetId || loading === mergeSourceId}
+                style={{ padding: "0.5rem 1rem", fontSize: "0.875rem" }}
+              >
+                {loading === mergeSourceId ? "Wird zusammengeführt..." : "Zusammenführen"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
