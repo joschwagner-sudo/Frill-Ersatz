@@ -40,22 +40,13 @@ export default async function AnnouncementsPage() {
     include: {
       createdBy: { select: { email: true } },
       category: true,
-      reactions: userId
-        ? {
-            where: {
-              OR: SUPPORTED_EMOJIS.map((emoji) => ({ emoji })),
-            },
-          }
-        : {
-            where: {
-              OR: SUPPORTED_EMOJIS.map((emoji) => ({ emoji })),
-            },
-            select: {
-              id: true,
-              emoji: true,
-              userId: true,
-            },
-          },
+      reactions: {
+      select: {
+        id: true,
+        emoji: true,
+        userId: true,
+      },
+    },
     },
     orderBy: [{ pinned: "desc" }, { publishedAt: "desc" }],
   });
@@ -104,9 +95,7 @@ export default async function AnnouncementsPage() {
 
             // Aggregate reactions by emoji
             const reactionsByEmoji = SUPPORTED_EMOJIS.map((emoji) => {
-              const matching = (
-                ann.reactions as { emoji: string; userId: string }[]
-              ).filter((r) => r.emoji === emoji);
+              const matching = ann.reactions.filter((r) => r.emoji === emoji);
               return {
                 emoji,
                 count: matching.length,
