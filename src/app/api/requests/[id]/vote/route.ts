@@ -1,5 +1,17 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+
+async function getSessionUser() {
+    const cookieStore = await cookies();
+    const session = cookieStore.get("session");
+    if (!session?.value) return null;
+    try {
+        return JSON.parse(Buffer.from(session.value, "base64").toString("utf-8"));
+    } catch {
+        return null;
+    }
+}
 
 // POST /api/requests/[id]/vote — toggle vote
 export async function POST(
@@ -8,12 +20,12 @@ export async function POST(
 ) {
     try {
         const { id } = await params;
-        const body = await request.json();
-        const { userId } = body;
-
-        if (!userId) {
-            return NextResponse.json({ error: "userId required" }, { status: 400 });
+        
+        const session = await getSessionUser();
+        if (!session?.userId) {
+            return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
         }
+        const userId = session.userId;
 
         // Check feature request exists
         const featureRequest = await prisma.featureRequest.findUnique({ where: { id } });
@@ -29,14 +41,18 @@ export async function POST(
         if (existingVote) {
             // Remove vote (toggle off)
             await prisma.vote.delete({ where: { id: existingVote.id } });
-            return NextResponse.json({ voted: false, message: "Vote removed" });
         } else {
             // Add vote
             await prisma.vote.create({
                 data: { userId, featureRequestId: id },
             });
-            return NextResponse.json({ voted: true, message: "Vote added" }, { status: 201 });
         }
+
+        // Get updated count
+        const voteCount = await prisma.vote.count({ where: { featureRequestId: id } });
+        const hasVoted = !existingVote;
+
+        return NextResponse.json({ voteCount, hasVoted });
     } catch (error) {
         console.error("Vote API error:", error);
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
