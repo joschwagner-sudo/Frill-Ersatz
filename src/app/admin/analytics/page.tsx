@@ -73,10 +73,10 @@ export default async function AnalyticsPage() {
   const votesPerDay = await prisma.$queryRaw<
     { date: string; count: bigint }[]
   >`
-    SELECT DATE(created_at) as date, COUNT(*) as count
+    SELECT DATE("createdAt") as date, COUNT(*) as count
     FROM "Vote"
-    WHERE created_at >= ${thirtyDaysAgo}
-    GROUP BY DATE(created_at)
+    WHERE "createdAt" >= ${thirtyDaysAgo}
+    GROUP BY DATE("createdAt")
     ORDER BY date ASC
   `;
 
