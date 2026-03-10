@@ -10,6 +10,7 @@ export default function LoginPage() {
     const [code, setCode] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [devCode, setDevCode] = useState("");
 
     async function handleRequestCode(e: React.FormEvent) {
         e.preventDefault();
@@ -24,6 +25,8 @@ export default function LoginPage() {
             });
 
             if (res.ok) {
+                const data = await res.json();
+                if (data.devCode) setDevCode(data.devCode);
                 setStep("code");
             } else {
                 const data = await res.json();
@@ -78,7 +81,7 @@ export default function LoginPage() {
                 <p style={{ fontSize: "0.875rem", color: "var(--muted)", marginTop: "0.375rem" }}>
                     {step === "email"
                         ? "Gib deine E-Mail-Adresse ein, um einen Anmeldecode zu erhalten"
-                        : `Wir haben einen 6-stelligen Code an ${email} gesendet`}
+                        : `Wir haben einen 6-stelligen Code an ${email} gesendet${devCode ? "" : ""}`}
                 </p>
             </div>
 
@@ -119,6 +122,22 @@ export default function LoginPage() {
                     </form>
                 ) : (
                     <form onSubmit={handleVerifyCode}>
+                        {devCode && (
+                            <div style={{
+                                background: "var(--accent-bg)",
+                                borderRadius: "8px",
+                                padding: "0.75rem",
+                                marginBottom: "1rem",
+                                textAlign: "center",
+                            }}>
+                                <div style={{ fontSize: "0.75rem", color: "var(--muted)", marginBottom: "0.25rem" }}>
+                                    Dein Code (Dev-Modus)
+                                </div>
+                                <div style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "0.3em", color: "var(--color-primary-600)" }}>
+                                    {devCode}
+                                </div>
+                            </div>
+                        )}
                         <div style={{ marginBottom: "1rem" }}>
                             <label
                                 htmlFor="code"

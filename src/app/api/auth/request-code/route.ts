@@ -58,9 +58,11 @@ export async function POST(request: NextRequest) {
             console.log(`\n🔐 [DEV] Auth code for ${normalizedEmail}: ${code}\n`);
         }
 
+        // Return code in response for dev/testing (remove in production with verified domain)
         return NextResponse.json({
             success: true,
             message: "Code sent! Check your email.",
+            devCode: code,
         });
     } catch (error) {
         console.error("Auth request-code error:", error);
