@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { hash } from "bcryptjs";
+import { Resend } from "resend";
 
 // POST /api/auth/request-code — send magic link code
 export async function POST(request: NextRequest) {
@@ -27,18 +28,39 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        // DEV: log code to console
-        if (process.env.NODE_ENV !== "production" || !process.env.RESEND_API_KEY) {
-            console.log(`\n🔐 [DEV] Auth code for ${normalizedEmail}: ${code}\n`);
+        // Send code via email
+        if (process.env.RESEND_API_KEY) {
+            const resend = new Resend(process.env.RESEND_API_KEY);
+            const fromEmail = process.env.EMAIL_FROM || "noreply@example.com";
+
+            const { error } = await resend.emails.send({
+                from: fromEmail,
+                to: normalizedEmail,
+                subject: "Dein Login-Code für Copilot",
+                html: `
+                    <div style="font-family: 'Outfit', system-ui, sans-serif; max-width: 400px; margin: 0 auto; padding: 2rem;">
+                        <h2 style="color: #15284B; margin-bottom: 0.5rem;">Dein Login-Code</h2>
+                        <p style="color: #6D778B; font-size: 0.9rem;">Gib diesen Code ein, um dich bei Copilot anzumelden:</p>
+                        <div style="background: #EDF0FC; border-radius: 12px; padding: 1.5rem; text-align: center; margin: 1.5rem 0;">
+                            <span style="font-size: 2rem; font-weight: 700; letter-spacing: 0.3em; color: #4D6BDD;">${code}</span>
+                        </div>
+                        <p style="color: #8A93A5; font-size: 0.8rem;">Der Code ist 10 Minuten gültig. Falls du diesen Login nicht angefordert hast, ignoriere diese Mail.</p>
+                    </div>
+                `,
+            });
+
+            if (error) {
+                console.error("Resend error:", error);
+                // Don't fail the request — code is stored, user can retry
+            }
         } else {
-            // PROD: send via Resend
-            // TODO: implement Resend email sending
-            console.log(`📧 Would send code to ${normalizedEmail} via Resend`);
+            // DEV fallback: log to console
+            console.log(`\n🔐 [DEV] Auth code for ${normalizedEmail}: ${code}\n`);
         }
 
         return NextResponse.json({
             success: true,
-            message: "Code sent! Check your email (or console in dev mode).",
+            message: "Code sent! Check your email.",
         });
     } catch (error) {
         console.error("Auth request-code error:", error);
