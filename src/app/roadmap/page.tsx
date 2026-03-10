@@ -111,8 +111,11 @@ export default async function RoadmapPage() {
                                 <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
                                     {items.map((item) => {
                                         const req = item.featureRequest;
-                                        const statusInfo = statusConfig[req.status] || {
+                                        const statusInfo = req.status ? (statusConfig[req.status] || {
                                             label: req.status,
+                                            color: "var(--muted)",
+                                        }) : {
+                                            label: "Kein Status",
                                             color: "var(--muted)",
                                         };
 

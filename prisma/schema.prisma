@@ -38,15 +38,20 @@ model AuthCode {
 
 // ─── Feature Request ──────────────────────────────────
 model FeatureRequest {
-  id          String   @id @default(cuid())
-  title       String   // max 80 chars (validated in app)
-  description String   // markdown
-  type        String   @default("FEATURE") // FEATURE | BUG
-  status      String   @default("UNDER_REVIEW") // UNDER_REVIEW | PLANNED | IN_PROGRESS | DONE | NOT_PLANNED
-  tags        String   @default("") // comma-separated for SQLite simplicity
-  archived    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String   @id @default(cuid())
+  number         Int      @default(autoincrement())
+  title          String   // max 80 chars (validated in app)
+  description    String   // markdown
+  type           String   @default("FEATURE") // FEATURE | BUG
+  status         String?  // UNDER_REVIEW | PLANNED | IN_PROGRESS | DONE | NOT_PLANNED
+  approvalStatus String   @default("NEEDS_APPROVAL") // NEEDS_APPROVAL | APPROVED | REJECTED
+  isPinned       Boolean  @default(false)
+  isPrivate      Boolean  @default(false)
+  isShortlisted  Boolean  @default(false)
+  tags           String   @default("") // comma-separated for SQLite simplicity
+  archived       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   createdById String
   createdBy   User @relation("CreatedRequests", fields: [createdById], references: [id])
@@ -54,10 +59,13 @@ model FeatureRequest {
   votes       Vote[]
   comments    Comment[]
   roadmapItem RoadmapItem?
+  topics      IdeaTopics[]
 
   @@index([createdById])
   @@index([type])
   @@index([status])
+  @@index([approvalStatus])
+  @@index([number])
 }
 
 // ─── Vote ─────────────────────────────────────────────
@@ -152,4 +160,29 @@ model Comment {
 
   @@index([featureRequestId])
   @@index([userId])
+}
+
+// ─── Topic ────────────────────────────────────────────
+model Topic {
+  id        String   @id @default(cuid())
+  name      String
+  emoji     String   @default("")
+  order     Int      @default(0)
+  isPrivate Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ideas     IdeaTopics[]
+}
+
+// ─── Idea Topics (Many-to-Many) ───────────────────────
+model IdeaTopics {
+  id               String         @id @default(cuid())
+  featureRequestId String
+  featureRequest   FeatureRequest @relation(fields: [featureRequestId], references: [id], onDelete: Cascade)
+  topicId          String
+  topic            Topic          @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@unique([featureRequestId, topicId])
+  @@index([featureRequestId])
+  @@index([topicId])
 }

@@ -103,9 +103,11 @@ export default async function RequestDetailPage({
                             <span className={`badge ${typeConfig[request.type]?.class || ""}`}>
                                 {typeConfig[request.type]?.label || request.type}
                             </span>
-                            <span className={`badge ${statusConfig[request.status]?.class || ""}`}>
-                                {statusConfig[request.status]?.label || request.status}
-                            </span>
+                            {request.status && (
+                                <span className={`badge ${statusConfig[request.status]?.class || ""}`}>
+                                    {statusConfig[request.status]?.label || request.status}
+                                </span>
+                            )}
                         </div>
 
                         <div
