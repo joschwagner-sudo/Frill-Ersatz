@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { cookies } from "next/headers";
+import { getCurrentUser } from "@/lib/session";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import EmailNotificationToggle from "@/components/EmailNotificationToggle";
@@ -22,23 +22,9 @@ const approvalConfig: Record<string, { label: string; class: string }> = {
   REJECTED: { label: "Abgelehnt", class: "badge-rejected" },
 };
 
-async function getCurrentUser() {
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("session");
-  if (!sessionCookie) return null;
-
-  try {
-    const sessionData = JSON.parse(
-      Buffer.from(sessionCookie.value, "base64").toString("utf-8")
-    );
-    return sessionData.userId || null;
-  } catch {
-    return null;
-  }
-}
-
 export default async function AccountPage() {
-  const userId = await getCurrentUser();
+  const sessionUser = await getCurrentUser();
+  const userId = sessionUser?.userId || null;
 
   if (!userId) {
     redirect("/login");

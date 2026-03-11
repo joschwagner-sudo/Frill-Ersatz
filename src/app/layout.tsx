@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist_Mono } from "next/font/google";
 import Link from "next/link";
-import { cookies } from "next/headers";
 import UserNav from "@/components/UserNav";
+import { getCurrentUser } from "@/lib/session";
 import "./globals.css";
 
 const geistMono = Geist_Mono({
@@ -23,27 +23,13 @@ const navItems = [
   { href: "/announcements", label: "Neuigkeiten", icon: "" },
 ];
 
-async function getCurrentUser() {
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("session");
-  if (!sessionCookie) return null;
-
-  try {
-    const sessionData = JSON.parse(
-      Buffer.from(sessionCookie.value, "base64").toString("utf-8")
-    );
-    return sessionData.userId || null;
-  } catch {
-    return null;
-  }
-}
-
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const userId = await getCurrentUser();
+  const currentUser = await getCurrentUser();
+  const userId = currentUser?.userId || null;
 
   return (
     <html lang="de">

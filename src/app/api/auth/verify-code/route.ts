@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { compare } from "bcryptjs";
-import { cookies } from "next/headers";
 import { isAdminEmail } from "@/lib/env";
+import { getSession } from "@/lib/session";
 
 // POST /api/auth/verify-code — verify magic link code & create session
 export async function POST(request: NextRequest) {
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
         }
 
         if (!matchedCode) {
-            return NextResponse.json({ error: "Invalid or expired code" }, { status: 401 });
+            return NextResponse.json({ error: "Ungültiger oder abgelaufener Code" }, { status: 401 });
         }
 
         // Mark code as used
@@ -68,23 +68,12 @@ export async function POST(request: NextRequest) {
             });
         }
 
-        // Set session cookie (simple approach: store user ID + email as JSON, base64 encoded)
-        // In production, use iron-session or JWT for proper encryption
-        const sessionData = JSON.stringify({
-            userId: user.id,
-            email: user.email,
-            isAdmin: user.isAdmin,
-        });
-        const sessionToken = Buffer.from(sessionData).toString("base64");
-
-        const cookieStore = await cookies();
-        cookieStore.set("session", sessionToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            maxAge: 60 * 60 * 24 * 7, // 7 days
-            path: "/",
-        });
+        // Set encrypted session via iron-session
+        const session = await getSession();
+        session.userId = user.id;
+        session.email = user.email;
+        session.isAdmin = user.isAdmin;
+        await session.save();
 
         return NextResponse.json({
             success: true,

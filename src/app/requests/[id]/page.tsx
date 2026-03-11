@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { cookies } from "next/headers";
+import { getCurrentUser } from "@/lib/session";
 import type { Metadata } from "next";
 import Markdown from "@/components/Markdown";
 import CommentSection from "@/components/CommentSection";
@@ -67,20 +67,6 @@ const statusConfig: Record<
   MERGED: { label: "Zusammengeführt", emoji: "🔀", class: "badge-merged" },
 };
 
-async function getCurrentUser() {
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("session");
-  if (!sessionCookie) return null;
-
-  try {
-    const sessionData = JSON.parse(
-      Buffer.from(sessionCookie.value, "base64").toString("utf-8")
-    );
-    return sessionData.userId || null;
-  } catch {
-    return null;
-  }
-}
 
 export default async function RequestDetailPage({
   params,
@@ -88,7 +74,8 @@ export default async function RequestDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const userId = await getCurrentUser();
+  const _user = await getCurrentUser();
+  const userId = _user?.userId || null;
 
   const request = await prisma.featureRequest.findUnique({
     where: { id },

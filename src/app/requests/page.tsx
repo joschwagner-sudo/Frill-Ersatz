@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { cookies } from "next/headers";
+import { getCurrentUser } from "@/lib/session";
 import VoteButton from "@/components/VoteButton";
 
 export const dynamic = "force-dynamic";
@@ -15,21 +15,6 @@ const statusConfig: Record<
   DONE: { label: "Erledigt", emoji: "🎉", class: "badge-done" },
 };
 
-// Helper to get current user from session cookie
-async function getCurrentUser() {
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("session");
-  if (!sessionCookie) return null;
-
-  try {
-    const sessionData = JSON.parse(
-      Buffer.from(sessionCookie.value, "base64").toString("utf-8")
-    );
-    return sessionData.userId || null;
-  } catch {
-    return null;
-  }
-}
 
 export default async function RequestsPage({
   searchParams,
@@ -44,7 +29,8 @@ export default async function RequestsPage({
   const params = await searchParams;
   const { status, topic, sort, q } = params;
 
-  const userId = await getCurrentUser();
+  const _user = await getCurrentUser();
+  const userId = _user?.userId || null;
 
   // Fetch all topics for the filter
   const topics = await prisma.topic.findMany({

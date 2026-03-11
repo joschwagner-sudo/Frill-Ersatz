@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
         // Send code via email
         if (process.env.RESEND_API_KEY) {
             const resend = new Resend(process.env.RESEND_API_KEY);
-            const fromEmail = process.env.EMAIL_FROM || "noreply@example.com";
+            const fromEmail = process.env.EMAIL_FROM || "onboarding@resend.dev";
 
             const { error } = await resend.emails.send({
                 from: fromEmail,
@@ -51,18 +51,18 @@ export async function POST(request: NextRequest) {
 
             if (error) {
                 console.error("Resend error:", error);
-                // Don't fail the request — code is stored, user can retry
+                return NextResponse.json(
+                    { error: "Code konnte nicht gesendet werden. Bitte versuche es erneut." },
+                    { status: 500 }
+                );
             }
         } else {
-            // DEV fallback: log to console
             console.log(`\n🔐 [DEV] Auth code for ${normalizedEmail}: ${code}\n`);
         }
 
-        // Return code in response for dev/testing (remove in production with verified domain)
         return NextResponse.json({
             success: true,
-            message: "Code sent! Check your email.",
-            devCode: code,
+            message: "Code gesendet! Überprüfe deine E-Mails.",
         });
     } catch (error) {
         console.error("Auth request-code error:", error);

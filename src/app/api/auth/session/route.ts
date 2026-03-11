@@ -1,23 +1,11 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { getSession, getCurrentUser } from "@/lib/session";
 
 // GET /api/auth/session — get current session
 export async function GET() {
     try {
-        const cookieStore = await cookies();
-        const session = cookieStore.get("session");
-
-        if (!session?.value) {
-            return NextResponse.json({ user: null });
-        }
-
-        try {
-            const decoded = Buffer.from(session.value, "base64").toString("utf-8");
-            const user = JSON.parse(decoded);
-            return NextResponse.json({ user });
-        } catch {
-            return NextResponse.json({ user: null });
-        }
+        const user = await getCurrentUser();
+        return NextResponse.json({ user });
     } catch {
         return NextResponse.json({ user: null });
     }
@@ -25,7 +13,7 @@ export async function GET() {
 
 // DELETE /api/auth/session — logout
 export async function DELETE() {
-    const cookieStore = await cookies();
-    cookieStore.delete("session");
+    const session = await getSession();
+    session.destroy();
     return NextResponse.json({ success: true });
 }

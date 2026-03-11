@@ -1,27 +1,17 @@
 import { prisma } from "@/lib/prisma";
-import { cookies } from "next/headers";
+import { getCurrentUser } from "@/lib/session";
 import { redirect } from "next/navigation";
 import AdminDashboard from "./AdminDashboard";
 
 export const dynamic = "force-dynamic";
 
-async function getSession() {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("session");
-  if (!session?.value) return null;
-  try {
-    return JSON.parse(Buffer.from(session.value, "base64").toString("utf-8"));
-  } catch {
-    return null;
-  }
-}
 
 type PageProps = {
   searchParams: Promise<{ tab?: string; filter?: string }>;
 };
 
 export default async function AdminPage({ searchParams }: PageProps) {
-  const session = await getSession();
+  const session = await getCurrentUser();
   if (!session?.isAdmin) redirect("/login");
 
   const params = await searchParams;

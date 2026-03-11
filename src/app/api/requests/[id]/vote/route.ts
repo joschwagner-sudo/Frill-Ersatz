@@ -1,17 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { getCurrentUser } from "@/lib/session";
 
-async function getSessionUser() {
-    const cookieStore = await cookies();
-    const session = cookieStore.get("session");
-    if (!session?.value) return null;
-    try {
-        return JSON.parse(Buffer.from(session.value, "base64").toString("utf-8"));
-    } catch {
-        return null;
-    }
-}
 
 // POST /api/requests/[id]/vote — toggle vote
 export async function POST(
@@ -21,7 +11,7 @@ export async function POST(
     try {
         const { id } = await params;
         
-        const session = await getSessionUser();
+        const session = await getCurrentUser();
         if (!session?.userId) {
             return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
         }

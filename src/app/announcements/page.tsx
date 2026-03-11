@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { cookies } from "next/headers";
+import { getCurrentUser } from "@/lib/session";
 import Markdown from "@/components/Markdown";
 import ReactionButtons from "@/components/ReactionButtons";
 
@@ -17,23 +17,10 @@ const categoryConfig: Record<
 
 const SUPPORTED_EMOJIS = ["🔥", "❤️", "👍"];
 
-async function getCurrentUser() {
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("session");
-  if (!sessionCookie) return null;
-
-  try {
-    const sessionData = JSON.parse(
-      Buffer.from(sessionCookie.value, "base64").toString("utf-8")
-    );
-    return sessionData.userId || null;
-  } catch {
-    return null;
-  }
-}
 
 export default async function AnnouncementsPage() {
-  const userId = await getCurrentUser();
+  const _user = await getCurrentUser();
+  const userId = _user?.userId || null;
 
   const announcements = await prisma.announcement.findMany({
     where: { publishedAt: { not: null } },

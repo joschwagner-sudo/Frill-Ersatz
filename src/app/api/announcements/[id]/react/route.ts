@@ -1,23 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { getCurrentUser } from "@/lib/session";
 
 const SUPPORTED_EMOJIS = ["🔥", "❤️", "👍"];
 
-async function getCurrentUser() {
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("session");
-  if (!sessionCookie) return null;
-
-  try {
-    const sessionData = JSON.parse(
-      Buffer.from(sessionCookie.value, "base64").toString("utf-8")
-    );
-    return sessionData.userId || null;
-  } catch {
-    return null;
-  }
-}
 
 export async function POST(
   request: NextRequest,
@@ -25,7 +11,8 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const userId = await getCurrentUser();
+    const _user = await getCurrentUser();
+  const userId = _user?.userId || null;
 
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
