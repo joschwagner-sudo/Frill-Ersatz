@@ -72,7 +72,7 @@ export default async function HomePage() {
             textAlign: "center",
           }}
         >
-          <div style={{ fontSize: "2.5rem", marginBottom: "0.75rem" }}></div>
+          <div style={{ fontSize: "2.5rem", marginBottom: "0.75rem" }}>🛟</div>
           <div style={{ fontWeight: 700, fontSize: "1.25rem", marginBottom: "0.5rem" }}>Probleme</div>
           <div style={{ fontSize: "0.875rem", color: "var(--muted)" }}>
             Bug gefunden? Melde dein Problem und wir helfen dir weiter
