@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, content, category } = body;
+    const { title, content } = body;
 
     if (!title || !content) {
       return NextResponse.json({ error: "Title and content required" }, { status: 400 });
@@ -34,10 +34,10 @@ export async function POST(request: NextRequest) {
     const announcement = await prisma.announcement.create({
       data: {
         title,
-        content,
-        category: category || "update",
+        body: content,
         createdById: session.userId,
       },
+      include: { createdBy: { select: { email: true } } },
     });
 
     return NextResponse.json({ success: true, announcement });

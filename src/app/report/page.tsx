@@ -119,7 +119,6 @@ export default function ReportPage() {
             type: "BUG",
             title: form.get("title"),
             description: `[${category}] ${form.get("description")}`,
-            pageUrl: form.get("pageUrl") || undefined,
         };
 
         try {
@@ -398,28 +397,6 @@ export default function ReportPage() {
                                     placeholder="Beschreibe das Problem möglichst genau..."
                                     className="input"
                                     style={{ resize: "vertical" }}
-                                />
-                            </div>
-
-                            {/* URL */}
-                            <div>
-                                <label
-                                    htmlFor="pageUrl"
-                                    style={{
-                                        display: "block",
-                                        fontSize: "0.8125rem",
-                                        fontWeight: 600,
-                                        marginBottom: "0.375rem",
-                                    }}
-                                >
-                                    Seiten-URL <span style={{ fontWeight: 400, color: "var(--muted)" }}>(optional)</span>
-                                </label>
-                                <input
-                                    id="pageUrl"
-                                    name="pageUrl"
-                                    type="url"
-                                    placeholder="https://..."
-                                    className="input"
                                 />
                             </div>
 

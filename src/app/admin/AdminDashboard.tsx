@@ -71,7 +71,7 @@ export default function AdminDashboard({
   const [mergeSourceId, setMergeSourceId] = useState<string | null>(null);
   const [mergeTargetId, setMergeTargetId] = useState<string>("");
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [newAnn, setNewAnn] = useState({ title: "", content: "", category: "update" });
+  const [newAnn, setNewAnn] = useState({ title: "", content: "" });
 
   const handleApprove = async (id: string) => {
     setLoading(id);
@@ -192,7 +192,7 @@ export default function AdminDashboard({
       if (res.ok) {
         const data = await res.json();
         setAnnouncements((prev) => [data.announcement, ...prev]);
-        setNewAnn({ title: "", content: "", category: "update" });
+        setNewAnn({ title: "", content: "" });
         setShowCreateModal(false);
         refreshStats();
       } else {
@@ -790,28 +790,11 @@ export default function AdminDashboard({
                 style={{ width: "100%", fontFamily: "monospace" }}
               />
             </div>
-            <div style={{ marginBottom: "1.5rem" }}>
-              <label htmlFor="annCategory" style={{ display: "block", fontSize: "0.875rem", fontWeight: 600, marginBottom: "0.5rem" }}>
-                Kategorie
-              </label>
-              <select
-                id="annCategory"
-                value={newAnn.category}
-                onChange={(e) => setNewAnn((prev) => ({ ...prev, category: e.target.value }))}
-                className="input"
-                style={{ width: "100%" }}
-              >
-                <option value="new">✨ Neu</option>
-                <option value="update">🔄 Update</option>
-                <option value="fix">🐛 Bugfix</option>
-                <option value="info">ℹ️ Info</option>
-              </select>
-            </div>
             <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
               <button
                 onClick={() => {
                   setShowCreateModal(false);
-                  setNewAnn({ title: "", content: "", category: "update" });
+                  setNewAnn({ title: "", content: "" });
                 }}
                 className="btn-secondary"
                 style={{ padding: "0.5rem 1rem", fontSize: "0.875rem" }}

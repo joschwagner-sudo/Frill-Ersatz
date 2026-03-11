@@ -6,16 +6,31 @@ import Link from "next/link";
 export default function NotificationBell() {
   const [unreadCount, setUnreadCount] = useState(0);
 
-  useEffect(() => {
+  const fetchUnreadCount = () => {
     fetch("/api/notifications")
       .then((res) => res.json())
       .then((data) => setUnreadCount(data.unreadCount || 0))
       .catch(() => setUnreadCount(0));
+  };
+
+  useEffect(() => {
+    fetchUnreadCount();
+
+    // Listen for custom event when notifications are marked as read
+    const handleNotificationsRead = () => {
+      setUnreadCount(0);
+    };
+
+    window.addEventListener("notifications-read", handleNotificationsRead);
+
+    return () => {
+      window.removeEventListener("notifications-read", handleNotificationsRead);
+    };
   }, []);
 
   return (
     <Link
-      href="/account/notifications"
+      href="/notifications"
       style={{
         position: "relative",
         display: "inline-flex",
