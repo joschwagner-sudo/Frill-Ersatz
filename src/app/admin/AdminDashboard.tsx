@@ -70,6 +70,8 @@ export default function AdminDashboard({
   const [loading, setLoading] = useState<string | null>(null);
   const [mergeSourceId, setMergeSourceId] = useState<string | null>(null);
   const [mergeTargetId, setMergeTargetId] = useState<string>("");
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newAnn, setNewAnn] = useState({ title: "", content: "", category: "update" });
 
   const handleApprove = async (id: string) => {
     setLoading(id);
@@ -172,6 +174,36 @@ export default function AdminDashboard({
       }
     } catch (error) {
       console.error("Failed to refresh stats:", error);
+    }
+  };
+
+  const handleCreateAnnouncement = async () => {
+    if (!newAnn.title || !newAnn.content) {
+      alert("Titel und Inhalt sind erforderlich");
+      return;
+    }
+    setLoading("create");
+    try {
+      const res = await fetch("/api/announcements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newAnn),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAnnouncements((prev) => [data.announcement, ...prev]);
+        setNewAnn({ title: "", content: "", category: "update" });
+        setShowCreateModal(false);
+        refreshStats();
+      } else {
+        const data = await res.json();
+        alert(data.error || "Fehler beim Erstellen");
+      }
+    } catch (error) {
+      console.error("Failed to create announcement:", error);
+      alert("Fehler beim Erstellen");
+    } finally {
+      setLoading(null);
     }
   };
 
@@ -298,7 +330,7 @@ export default function AdminDashboard({
       <div style={{ display: "flex", gap: "0.5rem", marginBottom: "2rem", borderBottom: "1px solid var(--card-border)", paddingBottom: "0.5rem" }}>
         {[
           { label: "Ideen", value: "ideas" },
-          { label: "Ankündigungen", value: "announcements" },
+          { label: "Neuigkeiten", value: "announcements" },
           { label: "Nutzer", value: "users" },
         ].map((tab) => (
           <Link
@@ -516,6 +548,16 @@ export default function AdminDashboard({
       {/* Announcements Tab */}
       {currentTab === "announcements" && (
         <div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+            <div></div>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="btn-primary"
+              style={{ padding: "0.5rem 1rem", fontSize: "0.875rem" }}
+            >
+              + Neue Neuigkeit
+            </button>
+          </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
             {announcements.map((ann) => (
               <div key={ann.id} className="card" style={{ padding: "1rem", display: "flex", alignItems: "center", gap: "1rem" }}>
@@ -552,7 +594,7 @@ export default function AdminDashboard({
 
           {announcements.length === 0 && (
             <div style={{ textAlign: "center", padding: "3rem", color: "var(--muted)" }}>
-              <p>Keine Ankündigungen gefunden</p>
+              <p>Keine Neuigkeiten gefunden</p>
             </div>
           )}
         </div>
@@ -683,6 +725,106 @@ export default function AdminDashboard({
                 style={{ padding: "0.5rem 1rem", fontSize: "0.875rem" }}
               >
                 {loading === mergeSourceId ? "Wird zusammengeführt..." : "Zusammenführen"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create Announcement Modal */}
+      {showCreateModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+          }}
+          onClick={() => setShowCreateModal(false)}
+        >
+          <div
+            className="card"
+            style={{
+              padding: "1.5rem",
+              maxWidth: "600px",
+              width: "90%",
+              maxHeight: "80vh",
+              overflowY: "auto",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ fontSize: "1.125rem", fontWeight: 700, marginBottom: "1rem" }}>
+              📣 Neue Neuigkeit erstellen
+            </h3>
+            <div style={{ marginBottom: "1rem" }}>
+              <label htmlFor="annTitle" style={{ display: "block", fontSize: "0.875rem", fontWeight: 600, marginBottom: "0.5rem" }}>
+                Titel
+              </label>
+              <input
+                id="annTitle"
+                type="text"
+                value={newAnn.title}
+                onChange={(e) => setNewAnn((prev) => ({ ...prev, title: e.target.value }))}
+                className="input"
+                placeholder="z.B. Neues Feature: Dark Mode"
+                style={{ width: "100%" }}
+              />
+            </div>
+            <div style={{ marginBottom: "1rem" }}>
+              <label htmlFor="annContent" style={{ display: "block", fontSize: "0.875rem", fontWeight: 600, marginBottom: "0.5rem" }}>
+                Inhalt (Markdown unterstützt)
+              </label>
+              <textarea
+                id="annContent"
+                value={newAnn.content}
+                onChange={(e) => setNewAnn((prev) => ({ ...prev, content: e.target.value }))}
+                className="input"
+                rows={8}
+                placeholder="Beschreibe die Neuigkeit..."
+                style={{ width: "100%", fontFamily: "monospace" }}
+              />
+            </div>
+            <div style={{ marginBottom: "1.5rem" }}>
+              <label htmlFor="annCategory" style={{ display: "block", fontSize: "0.875rem", fontWeight: 600, marginBottom: "0.5rem" }}>
+                Kategorie
+              </label>
+              <select
+                id="annCategory"
+                value={newAnn.category}
+                onChange={(e) => setNewAnn((prev) => ({ ...prev, category: e.target.value }))}
+                className="input"
+                style={{ width: "100%" }}
+              >
+                <option value="new">✨ Neu</option>
+                <option value="update">🔄 Update</option>
+                <option value="fix">🐛 Bugfix</option>
+                <option value="info">ℹ️ Info</option>
+              </select>
+            </div>
+            <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
+              <button
+                onClick={() => {
+                  setShowCreateModal(false);
+                  setNewAnn({ title: "", content: "", category: "update" });
+                }}
+                className="btn-secondary"
+                style={{ padding: "0.5rem 1rem", fontSize: "0.875rem" }}
+              >
+                Abbrechen
+              </button>
+              <button
+                onClick={handleCreateAnnouncement}
+                className="btn-primary"
+                disabled={loading === "create"}
+                style={{ padding: "0.5rem 1rem", fontSize: "0.875rem" }}
+              >
+                {loading === "create" ? "Wird erstellt..." : "Erstellen"}
               </button>
             </div>
           </div>
