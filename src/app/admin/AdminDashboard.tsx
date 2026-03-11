@@ -21,6 +21,8 @@ type Idea = {
 type Announcement = {
   id: string;
   title: string;
+  body: string;
+  pinned: boolean;
   publishedAt: string | null;
   createdAt: string;
   createdBy: { email: string };
@@ -72,6 +74,7 @@ export default function AdminDashboard({
   const [mergeTargetId, setMergeTargetId] = useState<string>("");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newAnn, setNewAnn] = useState({ title: "", content: "" });
+  const [editAnn, setEditAnn] = useState<{ id: string; title: string; content: string } | null>(null);
 
   const handleApprove = async (id: string) => {
     setLoading(id);
@@ -202,6 +205,65 @@ export default function AdminDashboard({
     } catch (error) {
       console.error("Failed to create announcement:", error);
       alert("Fehler beim Erstellen");
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleEditAnnouncement = async () => {
+    if (!editAnn) return;
+    setLoading(editAnn.id);
+    try {
+      const res = await fetch(`/api/admin/announcements/${editAnn.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: editAnn.title, content: editAnn.content }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAnnouncements((prev) =>
+          prev.map((a) => (a.id === editAnn.id ? { ...a, title: data.announcement.title } : a))
+        );
+        setEditAnn(null);
+      }
+    } catch (error) {
+      console.error("Failed to edit announcement:", error);
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleDeleteAnnouncement = async (id: string) => {
+    if (!confirm("Neuigkeit wirklich löschen?")) return;
+    setLoading(id);
+    try {
+      const res = await fetch(`/api/admin/announcements/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setAnnouncements((prev) => prev.filter((a) => a.id !== id));
+        refreshStats();
+      }
+    } catch (error) {
+      console.error("Failed to delete announcement:", error);
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handlePinAnnouncement = async (id: string, pinned: boolean) => {
+    setLoading(id);
+    try {
+      const res = await fetch(`/api/admin/announcements/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pinned }),
+      });
+      if (res.ok) {
+        setAnnouncements((prev) =>
+          prev.map((a) => (a.id === id ? { ...a, pinned } : a))
+        );
+      }
+    } catch (error) {
+      console.error("Failed to pin announcement:", error);
     } finally {
       setLoading(null);
     }
@@ -560,33 +622,93 @@ export default function AdminDashboard({
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
             {announcements.map((ann) => (
-              <div key={ann.id} className="card" style={{ padding: "1rem", display: "flex", alignItems: "center", gap: "1rem" }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600, fontSize: "0.875rem", marginBottom: "0.25rem" }}>{ann.title}</div>
-                  <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>
-                    {ann.createdBy.email} · {new Date(ann.createdAt).toLocaleDateString("de-DE")}
+              <div key={ann.id} className="card" style={{ padding: "1rem" }}>
+                <div style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.25rem" }}>
+                      {ann.pinned && <span title="Angepinnt">📌</span>}
+                      <div style={{ fontWeight: 600, fontSize: "0.875rem" }}>{ann.title}</div>
+                    </div>
+                    <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>
+                      {ann.createdBy.email} · {new Date(ann.createdAt).toLocaleDateString("de-DE")}
+                    </div>
+                    {/* Tags */}
+                    <div style={{ display: "flex", gap: "0.375rem", marginTop: "0.5rem", flexWrap: "wrap" }}>
+                      {ann.publishedAt ? (
+                        <span className="badge" style={{ background: "#10b98133", color: "#10b981", fontSize: "0.7rem" }}>
+                          Veröffentlicht
+                        </span>
+                      ) : (
+                        <span className="badge" style={{ background: "#D87C1333", color: "#D87C13", fontSize: "0.7rem" }}>
+                          Entwurf
+                        </span>
+                      )}
+                      {ann.pinned && (
+                        <span className="badge" style={{ background: "#ffd74933", color: "#b8860b", fontSize: "0.7rem" }}>
+                          Angepinnt
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
-                <div>
-                  {ann.publishedAt ? (
-                    <span className="badge" style={{ background: "#10b98133", color: "#10b981" }}>
-                      Veröffentlicht
-                    </span>
-                  ) : (
-                    <>
-                      <span className="badge" style={{ background: "#D87C1333", color: "#D87C13", marginRight: "0.5rem" }}>
-                        Entwurf
-                      </span>
+
+                  {/* Actions */}
+                  <div style={{ display: "flex", gap: "0.25rem", flexWrap: "wrap", alignItems: "center" }}>
+                    {!ann.publishedAt && (
                       <button
                         onClick={() => handlePublishAnnouncement(ann.id)}
                         disabled={loading === ann.id}
                         className="btn-primary"
-                        style={{ padding: "0.25rem 0.75rem", fontSize: "0.75rem" }}
+                        style={{ padding: "0.25rem 0.5rem", fontSize: "0.75rem" }}
                       >
-                        Veröffentlichen
+                        ✅ Veröffentlichen
                       </button>
-                    </>
-                  )}
+                    )}
+                    <button
+                      onClick={() => handlePinAnnouncement(ann.id, !ann.pinned)}
+                      disabled={loading === ann.id}
+                      style={{
+                        background: ann.pinned ? "#ffd74933" : "transparent",
+                        border: "1px solid var(--card-border)",
+                        padding: "0.15rem 0.4rem",
+                        borderRadius: "4px",
+                        fontSize: "0.75rem",
+                        cursor: "pointer",
+                      }}
+                      title={ann.pinned ? "Lösen" : "Anpinnen"}
+                    >
+                      📌
+                    </button>
+                    <button
+                      onClick={() => setEditAnn({ id: ann.id, title: ann.title, content: ann.body || "" })}
+                      disabled={loading === ann.id}
+                      style={{
+                        background: "transparent",
+                        border: "1px solid var(--card-border)",
+                        padding: "0.15rem 0.4rem",
+                        borderRadius: "4px",
+                        fontSize: "0.75rem",
+                        cursor: "pointer",
+                      }}
+                      title="Bearbeiten"
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      onClick={() => handleDeleteAnnouncement(ann.id)}
+                      disabled={loading === ann.id}
+                      style={{
+                        background: "transparent",
+                        border: "1px solid var(--card-border)",
+                        padding: "0.15rem 0.4rem",
+                        borderRadius: "4px",
+                        fontSize: "0.75rem",
+                        cursor: "pointer",
+                      }}
+                      title="Löschen"
+                    >
+                      🗑️
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -808,6 +930,84 @@ export default function AdminDashboard({
                 style={{ padding: "0.5rem 1rem", fontSize: "0.875rem" }}
               >
                 {loading === "create" ? "Wird erstellt..." : "Erstellen"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Announcement Modal */}
+      {editAnn && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+          }}
+          onClick={() => setEditAnn(null)}
+        >
+          <div
+            className="card"
+            style={{
+              padding: "1.5rem",
+              maxWidth: "600px",
+              width: "90%",
+              maxHeight: "80vh",
+              overflowY: "auto",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ fontSize: "1.125rem", fontWeight: 700, marginBottom: "1rem" }}>
+              ✏️ Neuigkeit bearbeiten
+            </h3>
+            <div style={{ marginBottom: "1rem" }}>
+              <label htmlFor="editAnnTitle" style={{ display: "block", fontSize: "0.875rem", fontWeight: 600, marginBottom: "0.5rem" }}>
+                Titel
+              </label>
+              <input
+                id="editAnnTitle"
+                type="text"
+                value={editAnn.title}
+                onChange={(e) => setEditAnn((prev) => prev ? { ...prev, title: e.target.value } : null)}
+                className="input"
+                style={{ width: "100%" }}
+              />
+            </div>
+            <div style={{ marginBottom: "1rem" }}>
+              <label htmlFor="editAnnContent" style={{ display: "block", fontSize: "0.875rem", fontWeight: 600, marginBottom: "0.5rem" }}>
+                Inhalt (Markdown unterstützt)
+              </label>
+              <textarea
+                id="editAnnContent"
+                value={editAnn.content}
+                onChange={(e) => setEditAnn((prev) => prev ? { ...prev, content: e.target.value } : null)}
+                className="input"
+                rows={8}
+                style={{ width: "100%", fontFamily: "monospace" }}
+              />
+            </div>
+            <div style={{ display: "flex", gap: "0.5rem", justifyContent: "flex-end" }}>
+              <button
+                onClick={() => setEditAnn(null)}
+                className="btn-secondary"
+                style={{ padding: "0.5rem 1rem", fontSize: "0.875rem" }}
+              >
+                Abbrechen
+              </button>
+              <button
+                onClick={handleEditAnnouncement}
+                className="btn-primary"
+                disabled={loading === editAnn.id}
+                style={{ padding: "0.5rem 1rem", fontSize: "0.875rem" }}
+              >
+                {loading === editAnn.id ? "Wird gespeichert..." : "Speichern"}
               </button>
             </div>
           </div>
