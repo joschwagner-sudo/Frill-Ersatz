@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import UserNav from "@/components/UserNav";
+import Logo from "@/components/Logo";
 import { getCurrentUser } from "@/lib/session";
 import "./globals.css";
 
@@ -69,34 +70,7 @@ export default async function RootLayout({
             }}
           >
             {/* Logo */}
-            <Link
-              href="/"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.625rem",
-                textDecoration: "none",
-                color: "var(--foreground)",
-                fontWeight: 700,
-                fontSize: "1.125rem",
-                letterSpacing: "-0.02em",
-              }}
-            >
-              <svg
-                width="28"
-                height="28"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <rect width="24" height="24" rx="6" fill="#1a56db" />
-                <path
-                  d="M7 12.5C7 9.46 9.46 7 12.5 7H14V9.5H12.5C10.84 9.5 9.5 10.84 9.5 12.5C9.5 14.16 10.84 15.5 12.5 15.5H14V13H16.5V18H12.5C9.46 18 7 15.54 7 12.5Z"
-                  fill="white"
-                />
-              </svg>
-              Copilot
-            </Link>
+            <Logo />
 
             {/* Nav Links */}
             <nav style={{ display: "flex", gap: "0.25rem", alignItems: "center" }}>
