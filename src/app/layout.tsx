@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 
 const navItems = [
   { href: "/requests", label: "Ideen", icon: "💡" },
+  { href: "/report", label: "Problem", icon: "🐛" },
   { href: "/roadmap", label: "Roadmap", icon: "🗺️" },
   { href: "/announcements", label: "Neuigkeiten", icon: "📣" },
 ];
@@ -120,19 +121,7 @@ export default async function RootLayout({
                 </Link>
               ))}
 
-              {/* Bug Report Link */}
-              <Link
-                href="/report"
-                className="nav-link"
-                style={{
-                  marginLeft: "0.5rem",
-                  paddingLeft: "0.875rem",
-                  borderLeft: "1px solid var(--card-border)",
-                }}
-              >
-                <span>🐛</span>
-                <span className="hidden sm:inline">Bug melden</span>
-              </Link>
+
             </nav>
 
             {/* Account / Login */}
