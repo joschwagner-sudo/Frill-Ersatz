@@ -16,9 +16,9 @@ export default async function HomePage() {
             marginBottom: "1rem",
           }}
         >
-          Gestalte den Copilot
+          Hilf uns, den Finanzfluss
           <br />
-          <span style={{ color: "var(--color-primary-500)" }}>mit</span>
+          <span style={{ color: "var(--color-primary-500)" }}>Copilot besser zu machen</span>
         </h1>
         <p
           style={{
@@ -29,8 +29,7 @@ export default async function HomePage() {
             lineHeight: 1.6,
           }}
         >
-          Hier siehst du, woran wir arbeiten — und kannst mitbestimmen, was als Nächstes kommt.
-          Reiche eigene Ideen ein oder stimme für bestehende Vorschläge ab.
+          Sieh dir an, woran wir gerade arbeiten, stimme für neue Features ab oder bringe deine eigenen Ideen ein.
         </p>
       </div>
 
