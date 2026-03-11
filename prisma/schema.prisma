@@ -52,6 +52,7 @@ model FeatureRequest {
   isPrivate      Boolean  @default(false)
   isShortlisted  Boolean  @default(false)
   tags           String   @default("") // comma-separated for SQLite simplicity
+  isAnonymous    Boolean  @default(true)
   archived       Boolean  @default(false)
   mergedIntoId   String?  // If merged, points to target idea
   createdAt      DateTime @default(now())

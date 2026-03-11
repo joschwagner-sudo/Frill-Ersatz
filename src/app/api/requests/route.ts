@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         
         // Simplified validation for now - just check required fields
-        const { title, description, topicId, userId } = body;
+        const { title, description, topicId, userId, isAnonymous } = body;
 
         if (!title || !description || !topicId || !userId) {
             return NextResponse.json(
@@ -86,8 +86,9 @@ export async function POST(request: NextRequest) {
             data: {
                 title,
                 description,
-                type: "FEATURE", // Always FEATURE for ideas (bugs go to /report)
-                approvalStatus: "NEEDS_APPROVAL", // Default, will be approved by admin
+                type: "FEATURE",
+                approvalStatus: "NEEDS_APPROVAL",
+                isAnonymous: isAnonymous !== false, // Default true
                 createdById: userId,
                 topics: {
                     create: {

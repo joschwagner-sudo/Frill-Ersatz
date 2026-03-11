@@ -222,7 +222,7 @@ export default async function RequestDetailPage({
                 color: "var(--muted)",
               }}
             >
-              <span>von {request.createdBy.email.split("@")[0]}</span>
+              <span>von {request.isAnonymous ? "Anonym" : request.createdBy.email.split("@")[0]}</span>
               <span>·</span>
               <span>
                 {new Date(request.createdAt).toLocaleDateString("de-DE")}

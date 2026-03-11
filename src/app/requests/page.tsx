@@ -398,7 +398,7 @@ export default async function RequestsPage({
                       color: "var(--muted-foreground)",
                     }}
                   >
-                    <span>{req.createdBy.email.split("@")[0]}</span>
+                    <span>{req.isAnonymous ? "Anonym" : req.createdBy.email.split("@")[0]}</span>
                     <span>·</span>
                     <span>
                       {new Date(req.createdAt).toLocaleDateString("de-DE")}

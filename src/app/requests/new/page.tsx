@@ -8,6 +8,7 @@ export default function NewRequestPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState("");
+  const [isAnonymous, setIsAnonymous] = useState(true);
   const [topics, setTopics] = useState<
     { id: string; name: string; emoji: string }[]
   >([]);
@@ -59,6 +60,7 @@ export default function NewRequestPage() {
           description: form.get("description"),
           topicId,
           userId,
+          isAnonymous,
         }),
       });
 
@@ -231,6 +233,57 @@ export default function NewRequestPage() {
               className="input"
               style={{ resize: "vertical" }}
             />
+          </div>
+
+          {/* Anonymous Toggle */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "0.75rem 1rem",
+              background: "var(--accent-bg)",
+              borderRadius: "8px",
+              border: "1px solid var(--card-border)",
+            }}
+          >
+            <div>
+              <div style={{ fontSize: "0.875rem", fontWeight: 600 }}>
+                Anonym einreichen
+              </div>
+              <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>
+                {isAnonymous ? "Dein Name wird nicht angezeigt" : "Dein Name wird öffentlich angezeigt"}
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsAnonymous(!isAnonymous)}
+              style={{
+                width: "3rem",
+                height: "1.625rem",
+                borderRadius: "9999px",
+                border: "none",
+                background: isAnonymous ? "var(--color-primary-500)" : "var(--card-border)",
+                position: "relative",
+                cursor: "pointer",
+                transition: "background 0.2s",
+                flexShrink: 0,
+              }}
+            >
+              <div
+                style={{
+                  width: "1.25rem",
+                  height: "1.25rem",
+                  borderRadius: "50%",
+                  background: "white",
+                  position: "absolute",
+                  top: "0.1875rem",
+                  left: isAnonymous ? "1.5625rem" : "0.1875rem",
+                  transition: "left 0.2s",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+                }}
+              />
+            </button>
           </div>
 
           <button
