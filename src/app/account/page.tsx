@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/session";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import EmailNotificationToggle from "@/components/EmailNotificationToggle";
+import LogoutButton from "@/components/LogoutButton";
 
 export const dynamic = "force-dynamic";
 
@@ -71,15 +72,18 @@ export default async function AccountPage() {
     <div className="animate-in" style={{ maxWidth: "900px", margin: "0 auto" }}>
       {/* Header */}
       <div style={{ marginBottom: "2rem" }}>
-        <h1
-          style={{
-            fontSize: "1.875rem",
-            fontWeight: 700,
-            letterSpacing: "-0.02em",
-          }}
-        >
-          👤 Mein Bereich
-        </h1>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+          <h1
+            style={{
+              fontSize: "1.875rem",
+              fontWeight: 700,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            👤 Mein Bereich
+          </h1>
+          <LogoutButton />
+        </div>
         <p
           style={{
             fontSize: "0.9375rem",
@@ -102,6 +106,25 @@ export default async function AccountPage() {
             month: "long",
           })}
         </p>
+        {sessionUser?.isAdmin && (
+          <p style={{ marginTop: "0.75rem" }}>
+            <Link
+              href="/admin"
+              className="badge-done"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.25rem",
+                padding: "0.375rem 0.75rem",
+                borderRadius: "6px",
+                fontSize: "0.8125rem",
+                textDecoration: "none",
+              }}
+            >
+              🛠️ Admin Dashboard
+            </Link>
+          </p>
+        )}
       </div>
 
       {/* Stats */}
