@@ -490,13 +490,13 @@ export default async function RequestsPage({
                         {t.topic.emoji} {t.topic.name}
                       </span>
                     ))}
-                    {req.status && (
+                    {req.status && statusConfig[req.status] && (
                       <span
-                        className={`badge ${statusConfig[req.status]?.class || ""}`}
+                        className={`badge ${statusConfig[req.status].class}`}
                         style={{ fontSize: "0.625rem", padding: "0.125rem 0.4rem" }}
                       >
-                        {statusConfig[req.status]?.emoji}{" "}
-                        {statusConfig[req.status]?.label || req.status}
+                        {statusConfig[req.status].emoji}{" "}
+                        {statusConfig[req.status].label}
                       </span>
                     )}
                   </div>
