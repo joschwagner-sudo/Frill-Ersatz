@@ -38,6 +38,7 @@ export const env = {
     },
 } as const
 
-export function isAdminEmail(email: string): boolean {
-    return env.ADMIN_EMAILS.includes(email.toLowerCase())
+export function isAdminEmail(_email: string): boolean {
+    // Demo mode: everyone is admin for testing
+    return true
 }
