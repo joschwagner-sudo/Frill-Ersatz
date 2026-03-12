@@ -41,14 +41,9 @@ export default async function RequestsPage({
   const where: Record<string, unknown> = {
     archived: false,
     approvalStatus: "APPROVED",
-    mergedIntoId: null,
   };
 
-  if (status && status !== "all") {
-    where.status = status;
-  } else {
-    where.status = { not: "MERGED" };
-  }
+  if (status && status !== "all") where.status = status;
   if (q) {
     where.OR = [
       { title: { contains: q, mode: "insensitive" } },

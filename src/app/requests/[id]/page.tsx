@@ -64,7 +64,7 @@ const statusConfig: Record<
   PLANNED: { label: "To Do", emoji: "📋", class: "badge-planned" },
   IN_PROGRESS: { label: "In Arbeit", emoji: "🧑‍💻", class: "badge-progress" },
   DONE: { label: "Erledigt", emoji: "🎉", class: "badge-done" },
-  MERGED: { label: "Zusammengeführt", emoji: "🔀", class: "badge-merged" },
+
 };
 
 
