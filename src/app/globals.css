@@ -478,9 +478,21 @@ body {
   }
 }
 
-/* ─── Filter bar responsive ──────────────────────────── */
-@media (max-width: 768px) {
-  .filter-bar {
-    flex-direction: column;
-  }
+/* ─── Filter Dropdown ────────────────────────────────── */
+.filter-dropdown summary::-webkit-details-marker {
+  display: none;
+}
+
+.filter-dropdown summary::marker {
+  display: none;
+  content: "";
+}
+
+.filter-dropdown[open] summary {
+  background: var(--accent-bg);
+  border-color: var(--color-primary-300);
+}
+
+.filter-dropdown div a:hover {
+  background: var(--hover-bg) !important;
 }

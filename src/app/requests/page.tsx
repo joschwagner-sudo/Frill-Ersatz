@@ -243,70 +243,138 @@ export default async function RequestsPage({
           </Link>
         )}
 
-        {/* Filter (Status) */}
-        <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
-          <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--muted)", marginRight: "0.25rem" }}>Filter:</span>
-          {[
-            { value: "all", label: "Alle" },
-            { value: "UNDER_REVIEW", label: "In Prüfung" },
-            { value: "PLANNED", label: "To Do" },
-            { value: "IN_PROGRESS", label: "In Arbeit" },
-            { value: "DONE", label: "Erledigt" },
-          ].map((s) => (
-            <Link
-              key={s.value}
-              href={`/requests?status=${s.value}${topic ? `&topic=${topic}` : ""}${sort ? `&sort=${sort}` : ""}${q ? `&q=${q}` : ""}`}
-              className="btn-ghost"
+        {/* Filter (Status) — Dropdown */}
+        <div style={{ position: "relative" }}>
+          <details className="filter-dropdown" style={{ position: "relative" }}>
+            <summary
+              className="btn-secondary"
               style={{
-                fontSize: "0.75rem",
-                padding: "0.375rem 0.625rem",
-                borderRadius: "9999px",
-                border: "1px solid transparent",
-                ...((!status && s.value === "all") || status === s.value
-                  ? {
-                      background: "var(--accent-bg)",
-                      color: "var(--color-primary-600)",
-                      border: "1px solid var(--color-primary-300)",
-                    }
-                  : {}),
+                fontSize: "0.8125rem",
+                padding: "0.5rem 1rem",
+                cursor: "pointer",
+                listStyle: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.375rem",
               }}
             >
-              {s.label}
-            </Link>
-          ))}
+              🔎 Filter
+              {status && status !== "all" && (
+                <span style={{
+                  background: "var(--color-primary-600)",
+                  color: "white",
+                  borderRadius: "9999px",
+                  padding: "0.0625rem 0.375rem",
+                  fontSize: "0.6875rem",
+                  fontWeight: 700,
+                }}>1</span>
+              )}
+              <span style={{ fontSize: "0.625rem" }}>▼</span>
+            </summary>
+            <div style={{
+              position: "absolute",
+              top: "100%",
+              left: 0,
+              marginTop: "0.25rem",
+              background: "var(--card-bg)",
+              border: "1px solid var(--card-border)",
+              borderRadius: "8px",
+              boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+              zIndex: 20,
+              minWidth: "160px",
+              padding: "0.375rem",
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.125rem",
+            }}>
+              {[
+                { value: "all", label: "Alle Status" },
+                { value: "UNDER_REVIEW", label: "🔎 In Prüfung" },
+                { value: "PLANNED", label: "📋 To Do" },
+                { value: "IN_PROGRESS", label: "🧑‍💻 In Arbeit" },
+                { value: "DONE", label: "🎉 Erledigt" },
+              ].map((s) => (
+                <Link
+                  key={s.value}
+                  href={`/requests?status=${s.value}${topic ? `&topic=${topic}` : ""}${sort ? `&sort=${sort}` : ""}${q ? `&q=${q}` : ""}`}
+                  style={{
+                    display: "block",
+                    padding: "0.5rem 0.75rem",
+                    borderRadius: "6px",
+                    fontSize: "0.8125rem",
+                    textDecoration: "none",
+                    color: "var(--foreground)",
+                    fontWeight: (!status && s.value === "all") || status === s.value ? 600 : 400,
+                    background: (!status && s.value === "all") || status === s.value ? "var(--accent-bg)" : "transparent",
+                  }}
+                >
+                  {s.label}
+                </Link>
+              ))}
+            </div>
+          </details>
         </div>
 
-        {/* Sortieren */}
-        <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
-          <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--muted)", marginRight: "0.25rem" }}>Sortieren:</span>
-          {[
-            { value: "trending", label: "Im Trend" },
-            { value: "votes", label: "Meiste Upvotes" },
-            { value: "votes-least", label: "Wenigste Upvotes" },
-            { value: "newest", label: "Neueste" },
-            { value: "oldest", label: "Älteste" },
-          ].map((s) => (
-            <Link
-              key={s.value}
-              href={`/requests?sort=${s.value}${status ? `&status=${status}` : ""}${topic ? `&topic=${topic}` : ""}${q ? `&q=${q}` : ""}`}
-              className="btn-ghost"
+        {/* Sortieren — Dropdown */}
+        <div style={{ position: "relative" }}>
+          <details className="filter-dropdown" style={{ position: "relative" }}>
+            <summary
+              className="btn-secondary"
               style={{
-                fontSize: "0.75rem",
-                padding: "0.375rem 0.625rem",
-                borderRadius: "9999px",
-                border: "1px solid transparent",
-                ...((!sort && s.value === "trending") || sort === s.value
-                  ? {
-                      background: "var(--accent-bg)",
-                      color: "var(--color-primary-600)",
-                      border: "1px solid var(--color-primary-300)",
-                    }
-                  : {}),
+                fontSize: "0.8125rem",
+                padding: "0.5rem 1rem",
+                cursor: "pointer",
+                listStyle: "none",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.375rem",
               }}
             >
-              {s.label}
-            </Link>
-          ))}
+              ↕ Sortieren
+              <span style={{ fontSize: "0.625rem" }}>▼</span>
+            </summary>
+            <div style={{
+              position: "absolute",
+              top: "100%",
+              left: 0,
+              marginTop: "0.25rem",
+              background: "var(--card-bg)",
+              border: "1px solid var(--card-border)",
+              borderRadius: "8px",
+              boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+              zIndex: 20,
+              minWidth: "180px",
+              padding: "0.375rem",
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.125rem",
+            }}>
+              {[
+                { value: "trending", label: "🔥 Im Trend" },
+                { value: "votes", label: "👍 Meiste Upvotes" },
+                { value: "votes-least", label: "👎 Wenigste Upvotes" },
+                { value: "newest", label: "🆕 Neueste Vorschläge" },
+                { value: "oldest", label: "📅 Älteste Vorschläge" },
+              ].map((s) => (
+                <Link
+                  key={s.value}
+                  href={`/requests?sort=${s.value}${status ? `&status=${status}` : ""}${topic ? `&topic=${topic}` : ""}${q ? `&q=${q}` : ""}`}
+                  style={{
+                    display: "block",
+                    padding: "0.5rem 0.75rem",
+                    borderRadius: "6px",
+                    fontSize: "0.8125rem",
+                    textDecoration: "none",
+                    color: "var(--foreground)",
+                    fontWeight: (!sort && s.value === "trending") || sort === s.value ? 600 : 400,
+                    background: (!sort && s.value === "trending") || sort === s.value ? "var(--accent-bg)" : "transparent",
+                  }}
+                >
+                  {s.label}
+                </Link>
+              ))}
+            </div>
+          </details>
         </div>
       </div>
 

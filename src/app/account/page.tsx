@@ -106,25 +106,7 @@ export default async function AccountPage() {
             month: "long",
           })}
         </p>
-        {sessionUser?.isAdmin && (
-          <p style={{ marginTop: "0.75rem" }}>
-            <Link
-              href="/admin"
-              className="badge-done"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.25rem",
-                padding: "0.375rem 0.75rem",
-                borderRadius: "6px",
-                fontSize: "0.8125rem",
-                textDecoration: "none",
-              }}
-            >
-              🛠️ Admin Dashboard
-            </Link>
-          </p>
-        )}
+
       </div>
 
       {/* Stats */}
@@ -267,7 +249,7 @@ export default async function AccountPage() {
                       {approvalConfig[req.approvalStatus]?.label ||
                         req.approvalStatus}
                     </span>
-                    {req.status && (
+                    {req.status && req.status !== "MERGED" && (
                       <span
                         className={`badge ${statusConfig[req.status]?.class || ""}`}
                       >
@@ -378,7 +360,7 @@ export default async function AccountPage() {
                           {t.topic.emoji} {t.topic.name}
                         </span>
                       ))}
-                      {req.status && (
+                      {req.status && req.status !== "MERGED" && (
                         <span
                           className={`badge ${statusConfig[req.status]?.class || ""}`}
                         >

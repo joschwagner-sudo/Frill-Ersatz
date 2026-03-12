@@ -92,9 +92,6 @@ export default function EmailNotificationToggle({
         <div style={{ fontSize: "0.875rem", fontWeight: 600 }}>
           E-Mail Benachrichtigungen
         </div>
-        <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>
-          Wöchentlicher Digest mit neuen Ideen und Updates
-        </div>
       </div>
     </label>
   );
