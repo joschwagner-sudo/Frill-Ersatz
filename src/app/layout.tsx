@@ -31,6 +31,7 @@ export default async function RootLayout({
 }>) {
   const currentUser = await getCurrentUser();
   const userId = currentUser?.userId || null;
+  const isAdmin = currentUser?.isAdmin || false;
 
   return (
     <html lang="de">
@@ -80,8 +81,12 @@ export default async function RootLayout({
                   <span className="hidden sm:inline">{item.label}</span>
                 </Link>
               ))}
-
-
+              {isAdmin && (
+                <Link href="/admin" className="nav-link" style={{ fontWeight: 600, color: "var(--color-primary-600)" }}>
+                  <span>⚙️</span>
+                  <span className="hidden sm:inline">Admin</span>
+                </Link>
+              )}
             </nav>
 
             {/* Account / Login */}

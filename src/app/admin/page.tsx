@@ -24,6 +24,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
       where: { archived: false },
       include: {
         createdBy: { select: { email: true } },
+        topics: { include: { topic: { select: { name: true, emoji: true } } } },
         _count: { select: { votes: true, comments: true } },
       },
       orderBy: { createdAt: "desc" },
@@ -78,6 +79,7 @@ export default async function AdminPage({ searchParams }: PageProps) {
   // Serialize dates to strings for client component
   const serializedIdeas = ideas.map((idea) => ({
     ...idea,
+    topics: idea.topics.map((it) => ({ name: it.topic.name, emoji: it.topic.emoji })),
     createdAt: idea.createdAt.toISOString(),
     updatedAt: idea.updatedAt.toISOString(),
   }));

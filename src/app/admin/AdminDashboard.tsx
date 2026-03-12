@@ -7,6 +7,8 @@ type Idea = {
   id: string;
   number: number;
   title: string;
+  description?: string;
+  type?: string;
   status: string | null;
   approvalStatus: string;
   isPinned: boolean;
@@ -14,7 +16,9 @@ type Idea = {
   isShortlisted: boolean;
   archived: boolean;
   createdAt: string;
+  updatedAt?: string;
   createdBy: { email: string };
+  topics: { name: string; emoji: string }[];
   _count: { votes: number; comments: number };
 };
 
@@ -75,6 +79,60 @@ export default function AdminDashboard({
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newAnn, setNewAnn] = useState({ title: "", content: "" });
   const [editAnn, setEditAnn] = useState<{ id: string; title: string; content: string } | null>(null);
+
+  // ─── CSV Export ───────────────────────────────────────
+  const handleCsvExport = () => {
+    const approvalLabel = (s: string) => {
+      if (s === "APPROVED") return "Approved";
+      if (s === "REJECTED") return "Rejected";
+      return "Noch nicht approved";
+    };
+    const statusLabel = (s: string | null) => {
+      if (!s) return "";
+      const map: Record<string, string> = {
+        UNDER_REVIEW: "In Prüfung",
+        PLANNED: "To Do",
+        IN_PROGRESS: "In Arbeit",
+        DONE: "Erledigt",
+        NOT_PLANNED: "Nicht geplant",
+      };
+      return map[s] || s;
+    };
+    const esc = (v: string) => `"${v.replace(/"/g, '""')}"`;
+
+    const header = [
+      "Nr", "Titel", "Typ", "Status", "Approval", "Topics",
+      "Votes", "Kommentare", "Gepinnt", "Privat", "Shortlist",
+      "Archiviert", "Autor", "Erstellt", "Aktualisiert",
+    ];
+
+    const rows = ideas.map((idea) => [
+      idea.number,
+      esc(idea.title),
+      idea.type || "FEATURE",
+      esc(statusLabel(idea.status)),
+      esc(approvalLabel(idea.approvalStatus)),
+      esc(idea.topics.map((t) => `${t.emoji}${t.name}`).join(", ")),
+      idea._count.votes,
+      idea._count.comments,
+      idea.isPinned ? "Ja" : "Nein",
+      idea.isPrivate ? "Ja" : "Nein",
+      idea.isShortlisted ? "Ja" : "Nein",
+      idea.archived ? "Ja" : "Nein",
+      esc(idea.createdBy.email),
+      new Date(idea.createdAt).toLocaleDateString("de-DE"),
+      idea.updatedAt ? new Date(idea.updatedAt).toLocaleDateString("de-DE") : "",
+    ]);
+
+    const csv = [header.join(";"), ...rows.map((r) => r.join(";"))].join("\n");
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `ideen-export-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const handleApprove = async (id: string) => {
     setLoading(id);
@@ -361,13 +419,22 @@ export default function AdminDashboard({
               Verwalte Vorschläge, Ankündigungen und Nutzer
             </p>
           </div>
-          <Link
-            href="/admin/analytics"
-            className="btn-primary"
-            style={{ fontSize: "0.875rem", padding: "0.5rem 1rem", textDecoration: "none" }}
-          >
-            📊 Analytics
-          </Link>
+          <div style={{ display: "flex", gap: "0.5rem" }}>
+            <button
+              onClick={handleCsvExport}
+              className="btn-secondary"
+              style={{ fontSize: "0.875rem", padding: "0.5rem 1rem" }}
+            >
+              📥 CSV Export
+            </button>
+            <Link
+              href="/admin/analytics"
+              className="btn-primary"
+              style={{ fontSize: "0.875rem", padding: "0.5rem 1rem", textDecoration: "none" }}
+            >
+              📊 Analytics
+            </Link>
+          </div>
         </div>
       </div>
 
