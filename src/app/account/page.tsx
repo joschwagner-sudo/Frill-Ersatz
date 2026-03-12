@@ -80,7 +80,7 @@ export default async function AccountPage() {
               letterSpacing: "-0.02em",
             }}
           >
-            👤 Mein Bereich
+            Mein Bereich
           </h1>
           <LogoutButton />
         </div>
@@ -169,7 +169,7 @@ export default async function AccountPage() {
             marginBottom: "1rem",
           }}
         >
-          💡 Meine Ideen
+          Meine Ideen
         </h2>
 
         {user.createdRequests.length === 0 ? (
@@ -286,7 +286,7 @@ export default async function AccountPage() {
             marginBottom: "1rem",
           }}
         >
-          ▲ Meine Votes
+          Meine Votes
         </h2>
 
         {user.votes.length === 0 ? (
@@ -398,7 +398,7 @@ export default async function AccountPage() {
             marginBottom: "1rem",
           }}
         >
-          ⚙️ Einstellungen
+          Einstellungen
         </h2>
         <div className="card" style={{ padding: "1.5rem" }}>
           <EmailNotificationToggle

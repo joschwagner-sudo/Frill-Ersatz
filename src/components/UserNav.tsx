@@ -17,7 +17,7 @@ export default function UserNav({ hasUser }: { hasUser: boolean }) {
               fontSize: "0.875rem",
             }}
           >
-            <span>👤</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <span className="hidden sm:inline">Mein Bereich</span>
           </Link>
         </>

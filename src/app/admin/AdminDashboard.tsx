@@ -424,16 +424,18 @@ export default function AdminDashboard({
             <button
               onClick={handleCsvExport}
               className="btn-secondary"
-              style={{ fontSize: "0.875rem", padding: "0.5rem 1rem" }}
+              style={{ fontSize: "0.875rem", padding: "0.5rem 1rem", display: "flex", alignItems: "center", gap: "0.375rem" }}
             >
-              📥 CSV Export
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              CSV Export
             </button>
             <Link
               href="/admin/analytics"
               className="btn-primary"
-              style={{ fontSize: "0.875rem", padding: "0.5rem 1rem", textDecoration: "none" }}
+              style={{ fontSize: "0.875rem", padding: "0.5rem 1rem", textDecoration: "none", display: "flex", alignItems: "center", gap: "0.375rem" }}
             >
-              📊 Analytics
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              Analytics
             </Link>
           </div>
         </div>
@@ -445,7 +447,6 @@ export default function AdminDashboard({
           { label: "Gesamt Ideen", value: stats.totalIdeas, color: "var(--color-primary-600)" },
           { label: "Prüfung ausstehend", value: stats.needsApproval, color: "#D87C13" },
           { label: "Freigegeben", value: stats.approved, color: "#10b981" },
-          { label: "Nutzer", value: stats.totalUsers, color: "var(--color-info)" },
           { label: "Votes", value: stats.totalVotes, color: "var(--color-primary-500)" },
           { label: "Kommentare", value: stats.totalComments, color: "var(--muted)" },
         ].map((stat) => (
@@ -462,7 +463,6 @@ export default function AdminDashboard({
           { label: "Ideen", value: "ideas" },
           { label: "Neuigkeiten", value: "announcements" },
           { label: "E-Mails", value: "emails" },
-          { label: "Nutzer", value: "users" },
         ].map((tab) => (
           <Link
             key={tab.value}
@@ -792,53 +792,6 @@ export default function AdminDashboard({
       )}
 
       {/* Users Tab */}
-      {currentTab === "users" && (
-        <div>
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr style={{ borderBottom: "2px solid var(--card-border)" }}>
-                  <th style={{ padding: "0.75rem", textAlign: "left", fontSize: "0.75rem", color: "var(--muted)", fontWeight: 600 }}>E-Mail</th>
-                  <th style={{ padding: "0.75rem", textAlign: "left", fontSize: "0.75rem", color: "var(--muted)", fontWeight: 600 }}>Admin</th>
-                  <th style={{ padding: "0.75rem", textAlign: "center", fontSize: "0.75rem", color: "var(--muted)", fontWeight: 600 }}>Requests</th>
-                  <th style={{ padding: "0.75rem", textAlign: "center", fontSize: "0.75rem", color: "var(--muted)", fontWeight: 600 }}>Votes</th>
-                  <th style={{ padding: "0.75rem", textAlign: "left", fontSize: "0.75rem", color: "var(--muted)", fontWeight: 600 }}>Registriert</th>
-                  <th style={{ padding: "0.75rem", textAlign: "left", fontSize: "0.75rem", color: "var(--muted)", fontWeight: 600 }}>Letzter Login</th>
-                </tr>
-              </thead>
-              <tbody>
-                {initialUsers.map((user) => (
-                  <tr key={user.id} style={{ borderBottom: "1px solid var(--card-border)" }}>
-                    <td style={{ padding: "0.75rem", fontSize: "0.875rem", fontWeight: 500 }}>{user.email}</td>
-                    <td style={{ padding: "0.75rem" }}>
-                      {user.isAdmin ? (
-                        <span className="badge" style={{ background: "#4d6bdd33", color: "#4d6bdd" }}>Admin</span>
-                      ) : (
-                        <span style={{ color: "var(--muted)", fontSize: "0.75rem" }}>—</span>
-                      )}
-                    </td>
-                    <td style={{ padding: "0.75rem", textAlign: "center", fontSize: "0.875rem" }}>{user._count.createdRequests}</td>
-                    <td style={{ padding: "0.75rem", textAlign: "center", fontSize: "0.875rem" }}>{user._count.votes}</td>
-                    <td style={{ padding: "0.75rem", fontSize: "0.75rem", color: "var(--muted)" }}>
-                      {new Date(user.createdAt).toLocaleDateString("de-DE")}
-                    </td>
-                    <td style={{ padding: "0.75rem", fontSize: "0.75rem", color: "var(--muted)" }}>
-                      {user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleDateString("de-DE") : "—"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {initialUsers.length === 0 && (
-            <div style={{ textAlign: "center", padding: "3rem", color: "var(--muted)" }}>
-              <p>Keine Nutzer gefunden</p>
-            </div>
-          )}
-        </div>
-      )}
-
       {/* Emails Tab */}
       {currentTab === "emails" && (
         <AdminEmails ideas={ideas.filter((i) => i.approvalStatus === "APPROVED").map((i) => ({ id: i.id, number: i.number, title: i.title }))} />
