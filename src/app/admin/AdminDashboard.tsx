@@ -103,8 +103,7 @@ export default function AdminDashboard({
 
     const header = [
       "Nr", "Titel", "Typ", "Status", "Approval", "Topics",
-      "Votes", "Kommentare", "Gepinnt", "Privat", "Shortlist",
-      "Archiviert", "Autor", "Erstellt", "Aktualisiert",
+      "Votes", "Kommentare", "Archiviert", "Autor", "Erstellt", "Aktualisiert",
     ];
 
     const rows = ideas.map((idea) => [
@@ -116,9 +115,6 @@ export default function AdminDashboard({
       esc(idea.topics.map((t) => `${t.emoji}${t.name}`).join(", ")),
       idea._count.votes,
       idea._count.comments,
-      idea.isPinned ? "Ja" : "Nein",
-      idea.isPrivate ? "Ja" : "Nein",
-      idea.isShortlisted ? "Ja" : "Nein",
       idea.archived ? "Ja" : "Nein",
       esc(idea.createdBy.email),
       new Date(idea.createdAt).toLocaleDateString("de-DE"),
@@ -527,7 +523,7 @@ export default function AdminDashboard({
                   <th style={{ padding: "0.75rem", textAlign: "left", fontSize: "0.75rem", color: "var(--muted)", fontWeight: 600 }}>Status</th>
                   <th style={{ padding: "0.75rem", textAlign: "center", fontSize: "0.75rem", color: "var(--muted)", fontWeight: 600 }}>Votes</th>
                   <th style={{ padding: "0.75rem", textAlign: "center", fontSize: "0.75rem", color: "var(--muted)", fontWeight: 600 }}>💬</th>
-                  <th style={{ padding: "0.75rem", textAlign: "left", fontSize: "0.75rem", color: "var(--muted)", fontWeight: 600 }}>Flags</th>
+                  <th style={{ padding: "0.75rem", textAlign: "left", fontSize: "0.75rem", color: "var(--muted)", fontWeight: 600 }}>Archiv</th>
                   <th style={{ padding: "0.75rem", textAlign: "right", fontSize: "0.75rem", color: "var(--muted)", fontWeight: 600 }}>Aktionen</th>
                 </tr>
               </thead>
@@ -565,68 +561,21 @@ export default function AdminDashboard({
                     <td style={{ padding: "0.75rem", textAlign: "center", fontSize: "0.875rem", fontWeight: 600 }}>{idea._count.votes}</td>
                     <td style={{ padding: "0.75rem", textAlign: "center", fontSize: "0.875rem", color: "var(--muted)" }}>{idea._count.comments}</td>
                     <td style={{ padding: "0.75rem" }}>
-                      <div style={{ display: "flex", gap: "0.25rem", flexWrap: "wrap" }}>
-                        <button
-                          onClick={() => handleToggleFlag(idea.id, "isPinned", !idea.isPinned)}
-                          disabled={loading === idea.id}
-                          style={{
-                            background: idea.isPinned ? "#ffd74933" : "transparent",
-                            border: "1px solid var(--card-border)",
-                            padding: "0.15rem 0.4rem",
-                            borderRadius: "4px",
-                            fontSize: "0.75rem",
-                            cursor: "pointer",
-                          }}
-                          title="Pin"
-                        >
-                          📌
-                        </button>
-                        <button
-                          onClick={() => handleToggleFlag(idea.id, "isPrivate", !idea.isPrivate)}
-                          disabled={loading === idea.id}
-                          style={{
-                            background: idea.isPrivate ? "#4d6bdd33" : "transparent",
-                            border: "1px solid var(--card-border)",
-                            padding: "0.15rem 0.4rem",
-                            borderRadius: "4px",
-                            fontSize: "0.75rem",
-                            cursor: "pointer",
-                          }}
-                          title="Privat"
-                        >
-                          🔒
-                        </button>
-                        <button
-                          onClick={() => handleToggleFlag(idea.id, "isShortlisted", !idea.isShortlisted)}
-                          disabled={loading === idea.id}
-                          style={{
-                            background: idea.isShortlisted ? "#14c57e33" : "transparent",
-                            border: "1px solid var(--card-border)",
-                            padding: "0.15rem 0.4rem",
-                            borderRadius: "4px",
-                            fontSize: "0.75rem",
-                            cursor: "pointer",
-                          }}
-                          title="Shortlist"
-                        >
-                          ⭐
-                        </button>
-                        <button
-                          onClick={() => handleToggleFlag(idea.id, "archived", !idea.archived)}
-                          disabled={loading === idea.id}
-                          style={{
-                            background: idea.archived ? "#ef444433" : "transparent",
-                            border: "1px solid var(--card-border)",
-                            padding: "0.15rem 0.4rem",
-                            borderRadius: "4px",
-                            fontSize: "0.75rem",
-                            cursor: "pointer",
-                          }}
-                          title="Archiv"
-                        >
-                          🗃️
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => handleToggleFlag(idea.id, "archived", !idea.archived)}
+                        disabled={loading === idea.id}
+                        style={{
+                          background: idea.archived ? "#ef444433" : "transparent",
+                          border: "1px solid var(--card-border)",
+                          padding: "0.15rem 0.4rem",
+                          borderRadius: "4px",
+                          fontSize: "0.75rem",
+                          cursor: "pointer",
+                        }}
+                        title="Archiv"
+                      >
+                        🗃️
+                      </button>
                     </td>
                     <td style={{ padding: "0.75rem", textAlign: "right" }}>
                       <div style={{ display: "flex", gap: "0.25rem", justifyContent: "flex-end", flexWrap: "wrap" }}>

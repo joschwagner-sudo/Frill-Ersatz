@@ -28,10 +28,12 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        // Send code via email
-        if (process.env.RESEND_API_KEY) {
+        // Send code via email or show directly in dev mode
+        const useResend = process.env.RESEND_API_KEY && process.env.EMAIL_FROM;
+
+        if (useResend) {
             const resend = new Resend(process.env.RESEND_API_KEY);
-            const fromEmail = process.env.EMAIL_FROM || "onboarding@resend.dev";
+            const fromEmail = process.env.EMAIL_FROM!;
 
             const { error } = await resend.emails.send({
                 from: fromEmail,
@@ -56,14 +58,20 @@ export async function POST(request: NextRequest) {
                     { status: 500 }
                 );
             }
-        } else {
-            console.log(`\n🔐 [DEV] Auth code for ${normalizedEmail}: ${code}\n`);
-        }
 
-        return NextResponse.json({
-            success: true,
-            message: "Code gesendet! Überprüfe deine E-Mails.",
-        });
+            return NextResponse.json({
+                success: true,
+                message: "Code gesendet! Überprüfe deine E-Mails.",
+            });
+        } else {
+            // Dev mode: return code directly so anyone can test
+            console.log(`\n🔐 [DEV] Auth code for ${normalizedEmail}: ${code}\n`);
+            return NextResponse.json({
+                success: true,
+                message: "Code gesendet! Überprüfe deine E-Mails.",
+                devCode: code,
+            });
+        }
     } catch (error) {
         console.error("Auth request-code error:", error);
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });

@@ -435,25 +435,33 @@ body {
   color: var(--color-primary-600);
 }
 
-/* ─── Mobile Navigation ──────────────────────────────── */
+/* ─── Mobile Bottom Nav ──────────────────────────────── */
+.mobile-nav {
+  display: none;
+}
+
 @media (max-width: 640px) {
-  header nav {
+  /* Hide desktop nav in header */
+  .desktop-nav {
+    display: none !important;
+  }
+
+  /* Show mobile bottom nav */
+  .mobile-nav {
+    display: flex !important;
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    top: auto !important;
     z-index: 100;
     background: var(--nav-bg);
     backdrop-filter: blur(12px);
     border-top: 1px solid var(--card-border);
     padding: 0.5rem 0.25rem;
-    display: flex !important;
     justify-content: space-around;
-    gap: 0 !important;
   }
 
-  header nav .nav-link {
+  .mobile-nav .nav-link {
     flex-direction: column;
     gap: 0.125rem;
     padding: 0.375rem 0.5rem;
@@ -462,25 +470,9 @@ body {
     border-radius: 6px;
   }
 
-  /* Show labels on mobile too */
-  header nav .nav-link .hidden {
-    display: inline !important;
-  }
-
   /* Make room for bottom nav */
   main {
     padding-bottom: 5rem !important;
-  }
-
-  /* Adjust header layout for mobile */
-  header > div {
-    padding: 0 1rem !important;
-    height: 3.5rem !important;
-  }
-
-  /* Ensure logo stays visible */
-  header > div > a:first-child {
-    flex-shrink: 0;
   }
 }
 

@@ -10,6 +10,7 @@ export default function LoginPage() {
     const [code, setCode] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [devCode, setDevCode] = useState("");
 
     async function handleRequestCode(e: React.FormEvent) {
         e.preventDefault();
@@ -26,6 +27,10 @@ export default function LoginPage() {
             const data = await res.json();
             if (res.ok) {
                 setStep("code");
+                if (data.devCode) {
+                    setDevCode(data.devCode);
+                    setCode(data.devCode);
+                }
             } else {
                 setError(data.error || "Fehler beim Senden des Codes");
             }
@@ -119,6 +124,20 @@ export default function LoginPage() {
                     </form>
                 ) : (
                     <form onSubmit={handleVerifyCode}>
+                        {devCode && (
+                            <div style={{
+                                padding: "0.75rem",
+                                background: "#d1fae5",
+                                border: "1px solid #6ee7b7",
+                                borderRadius: "8px",
+                                marginBottom: "1rem",
+                                fontSize: "0.8125rem",
+                                color: "#065f46",
+                                textAlign: "center",
+                            }}>
+                                Dein Code: <strong style={{ letterSpacing: "0.2em", fontSize: "1.125rem" }}>{devCode}</strong>
+                            </div>
+                        )}
                         <div style={{ marginBottom: "1rem" }}>
                             <label
                                 htmlFor="code"
