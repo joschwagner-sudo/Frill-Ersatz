@@ -25,6 +25,7 @@ model User {
   emailLogs             AnnouncementEmailLog[]
   announcementReactions AnnouncementReaction[]
   notifications         Notification[]
+  commentReactions      CommentReaction[]
 }
 
 // ─── Auth Code (Magic Link 6-digit) ───────────────────
@@ -190,6 +191,7 @@ model Comment {
   id               String         @id @default(cuid())
   body             String
   isOfficial       Boolean        @default(false)
+  parentId         String?
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 
@@ -199,8 +201,29 @@ model Comment {
   featureRequestId String
   featureRequest   FeatureRequest @relation(fields: [featureRequestId], references: [id], onDelete: Cascade)
 
+  parent           Comment?       @relation("CommentReplies", fields: [parentId], references: [id], onDelete: SetNull)
+  replies          Comment[]      @relation("CommentReplies")
+  reactions        CommentReaction[]
+
   @@index([featureRequestId])
   @@index([userId])
+  @@index([parentId])
+}
+
+// ─── Comment Reaction ─────────────────────────────────
+model CommentReaction {
+  id        String   @id @default(cuid())
+  emoji     String   // 👍 ❤️ 😂 🎉 🤔 👀
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  commentId String
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, commentId, emoji])
+  @@index([commentId])
 }
 
 // ─── Topic ────────────────────────────────────────────

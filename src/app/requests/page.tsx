@@ -81,11 +81,13 @@ export default async function RequestsPage({
     orderBy:
       sort === "votes"
         ? { votes: { _count: "desc" } }
-        : sort === "oldest"
-          ? { createdAt: "asc" }
-          : sort === "trending"
-            ? { createdAt: "desc" } // We'll sort client-side for trending
-            : { createdAt: "desc" },
+        : sort === "votes-least"
+          ? { votes: { _count: "asc" } }
+          : sort === "oldest"
+            ? { createdAt: "asc" }
+            : sort === "trending"
+              ? { createdAt: "desc" } // We'll sort client-side for trending
+              : { createdAt: "desc" },
   });
 
   // Calculate trending votes if needed
@@ -215,27 +217,41 @@ export default async function RequestsPage({
         }}
       >
         {/* Search */}
-        <form style={{ flex: "1 1 200px" }}>
+        <form style={{ flex: "1 1 200px", display: "flex", gap: "0.375rem" }}>
           <input
             type="text"
             name="q"
             placeholder="Vorschläge durchsuchen..."
             defaultValue={q}
             className="input"
+            style={{ flex: 1 }}
           />
           {status && <input type="hidden" name="status" value={status} />}
           {topic && <input type="hidden" name="topic" value={topic} />}
           {sort && <input type="hidden" name="sort" value={sort} />}
+          <button type="submit" className="btn-primary" style={{ padding: "0.625rem 1rem", fontSize: "0.875rem", flexShrink: 0 }}>
+            🔍
+          </button>
         </form>
+        {q && (
+          <Link
+            href="/requests"
+            className="btn-secondary"
+            style={{ fontSize: "0.8rem", padding: "0.5rem 0.875rem", whiteSpace: "nowrap" }}
+          >
+            ✕ Suche zurücksetzen
+          </Link>
+        )}
 
-        {/* Status filter */}
-        <div style={{ display: "flex", gap: "0.25rem" }}>
+        {/* Filter (Status) */}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+          <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--muted)", marginRight: "0.25rem" }}>Filter:</span>
           {[
-            { value: "all", label: "Alle Status" },
-            ...Object.keys(statusConfig).map((key) => ({
-              value: key,
-              label: statusConfig[key].emoji + " " + statusConfig[key].label,
-            })),
+            { value: "all", label: "Alle" },
+            { value: "UNDER_REVIEW", label: "In Prüfung" },
+            { value: "PLANNED", label: "To Do" },
+            { value: "IN_PROGRESS", label: "In Arbeit" },
+            { value: "DONE", label: "Erledigt" },
           ].map((s) => (
             <Link
               key={s.value}
@@ -244,10 +260,13 @@ export default async function RequestsPage({
               style={{
                 fontSize: "0.75rem",
                 padding: "0.375rem 0.625rem",
+                borderRadius: "9999px",
+                border: "1px solid transparent",
                 ...((!status && s.value === "all") || status === s.value
                   ? {
                       background: "var(--accent-bg)",
                       color: "var(--color-primary-600)",
+                      border: "1px solid var(--color-primary-300)",
                     }
                   : {}),
               }}
@@ -257,12 +276,15 @@ export default async function RequestsPage({
           ))}
         </div>
 
-        {/* Sort */}
-        <div style={{ display: "flex", gap: "0.25rem" }}>
+        {/* Sortieren */}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+          <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--muted)", marginRight: "0.25rem" }}>Sortieren:</span>
           {[
+            { value: "trending", label: "Im Trend" },
+            { value: "votes", label: "Meiste Upvotes" },
+            { value: "votes-least", label: "Wenigste Upvotes" },
             { value: "newest", label: "Neueste" },
-            { value: "trending", label: "🔥 Im Trend" },
-            { value: "votes", label: "Meiste Stimmen" },
+            { value: "oldest", label: "Älteste" },
           ].map((s) => (
             <Link
               key={s.value}
@@ -271,10 +293,13 @@ export default async function RequestsPage({
               style={{
                 fontSize: "0.75rem",
                 padding: "0.375rem 0.625rem",
-                ...((!sort && s.value === "newest") || sort === s.value
+                borderRadius: "9999px",
+                border: "1px solid transparent",
+                ...((!sort && s.value === "trending") || sort === s.value
                   ? {
                       background: "var(--accent-bg)",
                       color: "var(--color-primary-600)",
+                      border: "1px solid var(--color-primary-300)",
                     }
                   : {}),
               }}
@@ -361,19 +386,6 @@ export default async function RequestsPage({
                         🔥
                       </span>
                     )}
-                    {req.topics.map((t) => (
-                      <span key={t.id} className="badge badge-topic">
-                        {t.topic.emoji} {t.topic.name}
-                      </span>
-                    ))}
-                    {req.status && (
-                      <span
-                        className={`badge ${statusConfig[req.status]?.class || ""}`}
-                      >
-                        {statusConfig[req.status]?.emoji}{" "}
-                        {statusConfig[req.status]?.label || req.status}
-                      </span>
-                    )}
                   </div>
                   <p
                     style={{
@@ -392,10 +404,12 @@ export default async function RequestsPage({
                   <div
                     style={{
                       display: "flex",
-                      gap: "0.75rem",
+                      alignItems: "center",
+                      gap: "0.5rem",
                       marginTop: "0.5rem",
-                      fontSize: "0.75rem",
+                      fontSize: "0.6875rem",
                       color: "var(--muted-foreground)",
+                      flexWrap: "wrap",
                     }}
                   >
                     <span>{req.isAnonymous ? "Anonym" : req.createdBy.email.split("@")[0]}</span>
@@ -403,6 +417,20 @@ export default async function RequestsPage({
                     <span>
                       {new Date(req.createdAt).toLocaleDateString("de-DE")}
                     </span>
+                    {req.topics.map((t) => (
+                      <span key={t.id} className="badge badge-topic" style={{ fontSize: "0.625rem", padding: "0.125rem 0.4rem" }}>
+                        {t.topic.emoji} {t.topic.name}
+                      </span>
+                    ))}
+                    {req.status && (
+                      <span
+                        className={`badge ${statusConfig[req.status]?.class || ""}`}
+                        style={{ fontSize: "0.625rem", padding: "0.125rem 0.4rem" }}
+                      >
+                        {statusConfig[req.status]?.emoji}{" "}
+                        {statusConfig[req.status]?.label || req.status}
+                      </span>
+                    )}
                   </div>
                 </Link>
               </div>

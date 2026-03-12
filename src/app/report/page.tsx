@@ -19,8 +19,8 @@ const helpcenterArticles: Record<string, { title: string; url: string }[]> = {
         { title: "Dashboard", url: "https://www.finanzfluss.de/copilot/hilfe/dashboard/" },
         { title: "Das Dashboard in der Copilot App", url: "https://www.finanzfluss.de/copilot/hilfe/dashboard-app/" },
         { title: "Abweichende Werte im Dashboard", url: "https://www.finanzfluss.de/copilot/hilfe/abweichende-werte-im-dashboard/" },
-        { title: "Breakdown", url: "https://www.finanzfluss.de/copilot/hilfe/breakdown/" },
         { title: "Analyse", url: "https://www.finanzfluss.de/copilot/hilfe/analyse/" },
+        { title: "Depot teilen", url: "https://www.finanzfluss.de/copilot/hilfe/teilen/" },
     ],
     "Import & Daten": [
         { title: "Automatischer Import", url: "https://www.finanzfluss.de/copilot/hilfe/auto-import/" },
@@ -40,7 +40,6 @@ const helpcenterArticles: Record<string, { title: string; url: string }[]> = {
         { title: "Konto oder Depot löschen", url: "https://www.finanzfluss.de/copilot/hilfe/konto-loschen/" },
         { title: "Bankverbindung aufheben", url: "https://www.finanzfluss.de/copilot/hilfe/bankverbindung-aufheben/" },
         { title: "Verrechnungskonto ändern", url: "https://www.finanzfluss.de/copilot/hilfe/falsches-verrechnungskonto/" },
-        { title: "Depot teilen", url: "https://www.finanzfluss.de/copilot/hilfe/teilen/" },
     ],
     "Investments & Wertpapiere": [
         { title: "Investments", url: "https://www.finanzfluss.de/copilot/hilfe/investment-seite/" },
@@ -89,8 +88,8 @@ const helpcenterArticles: Record<string, { title: string; url: string }[]> = {
         { title: "TAN-Abfrage", url: "https://www.finanzfluss.de/copilot/hilfe/wieso-fordert-dei-bank-eine-tan/" },
     ],
     "Sonstiges": [
+        { title: "Breakdown", url: "https://www.finanzfluss.de/copilot/hilfe/breakdown/" },
         { title: "Copilot Rolle im Discord bekommen", url: "https://www.finanzfluss.de/copilot/hilfe/discord/" },
-        { title: "Feature Request", url: "https://www.finanzfluss.de/copilot/hilfe/feature-request/" },
         { title: "Kostenlose Probeversion von Copilot PLUS", url: "https://www.finanzfluss.de/copilot/hilfe/probeabonnement/" },
         { title: "Familienfreigabe", url: "https://www.finanzfluss.de/copilot/hilfe/familienfregabe/" },
         { title: "Krypto-Transfer von Börse zu Coldwallet", url: "https://www.finanzfluss.de/copilot/hilfe/krypto-transfer-coldwallet/" },
@@ -350,6 +349,31 @@ export default function ReportPage() {
                                 }}
                             >
                                 Kategorie: <strong>{category}</strong>
+                            </div>
+
+                            {/* Info-Box für Support-Experten */}
+                            <div
+                                style={{
+                                    padding: "1rem",
+                                    background: "#fef2f2",
+                                    border: "1px solid #fecaca",
+                                    borderRadius: "8px",
+                                    fontSize: "0.8125rem",
+                                    color: "#991b1b",
+                                    lineHeight: 1.6,
+                                }}
+                            >
+                                <div style={{ fontWeight: 700, marginBottom: "0.5rem" }}>
+                                    📋 Bitte füge folgende Infos in deine Beschreibung ein:
+                                </div>
+                                <ul style={{ margin: 0, paddingLeft: "1.25rem" }}>
+                                    <li>Was funktioniert anders als erwartet?</li>
+                                    <li>Seit wann tritt das Problem auf?</li>
+                                    <li>Welche Schritte hast du bereits ausprobiert?</li>
+                                    <li>Welche Bank oder welcher Broker ist betroffen?</li>
+                                    <li>Nutzt du iOS, Android oder die Web-App? Tritt das Problem auf beiden Plattformen auf?</li>
+                                    <li>Falls möglich: bitte einen Screenshot oder ein kurzes Video anhängen.</li>
+                                </ul>
                             </div>
 
                             {/* Title */}

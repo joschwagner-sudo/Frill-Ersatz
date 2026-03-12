@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 import Markdown from "@/components/Markdown";
 import CommentSection from "@/components/CommentSection";
 import VoteButton from "@/components/VoteButton";
-import ShareButton from "@/components/ShareButton";
+
 
 export const dynamic = "force-dynamic";
 
@@ -89,6 +89,7 @@ export default async function RequestDetailPage({
       },
       roadmapItem: true,
       mergedInto: { select: { id: true, number: true, title: true } },
+      mergedFrom: { select: { id: true, number: true, title: true } },
       _count: { select: { votes: true } },
     },
   });
@@ -231,18 +232,13 @@ export default async function RequestDetailPage({
           </div>
         </div>
 
-        {/* Roadmap badge + Share buttons */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "1.25rem",
-            flexWrap: "wrap",
-            gap: "1rem",
-          }}
-        >
-          {request.roadmapItem && (
+        {/* Roadmap badge */}
+        {request.roadmapItem && (
+          <div
+            style={{
+              marginBottom: "1.25rem",
+            }}
+          >
             <div
               style={{
                 display: "inline-flex",
@@ -258,9 +254,8 @@ export default async function RequestDetailPage({
             >
               🗺️ Auf der Roadmap — {request.roadmapItem.quarter}
             </div>
-          )}
-          <ShareButton ideaId={request.id} title={request.title} />
-        </div>
+          </div>
+        )}
 
         {/* Description */}
         <div
@@ -277,7 +272,7 @@ export default async function RequestDetailPage({
       </div>
 
       {/* Comments Section */}
-      <CommentSection requestId={id} currentUser={currentUserObj} />
+      <CommentSection requestId={id} currentUser={currentUserObj} mergedFrom={request.mergedFrom} />
     </div>
   );
 }

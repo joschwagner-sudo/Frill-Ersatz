@@ -8,7 +8,9 @@ export default function NewRequestPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [title, setTitle] = useState("");
-  const [isAnonymous, setIsAnonymous] = useState(true);
+  const [isAnonymous, setIsAnonymous] = useState(false);
+  const [ideaType, setIdeaType] = useState<string>("");
+  const [platform, setPlatform] = useState<string>("");
   const [topics, setTopics] = useState<
     { id: string; name: string; emoji: string }[]
   >([]);
@@ -135,10 +137,9 @@ export default function NewRequestPage() {
         <div
           style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}
         >
-          {/* Topic Selection (Required) */}
+          {/* Step 1: Art des Vorschlags */}
           <div>
             <label
-              htmlFor="topic"
               style={{
                 display: "block",
                 fontSize: "0.875rem",
@@ -146,31 +147,103 @@ export default function NewRequestPage() {
                 marginBottom: "0.5rem",
               }}
             >
-              Topic{" "}
+              Was möchtest du einreichen?{" "}
               <span style={{ color: "var(--color-primary-600)" }}>*</span>
             </label>
-            <select
-              id="topic"
-              name="topic"
-              required
-              className="input"
-              style={{
-                cursor: "pointer",
-                appearance: "none",
-                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L2 4h8z'/%3E%3C/svg%3E")`,
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "right 0.75rem center",
-                paddingRight: "2.5rem",
-              }}
-            >
-              <option value="">— Bitte wählen —</option>
-              {topics.map((topic) => (
-                <option key={topic.id} value={topic.id}>
-                  {topic.emoji} {topic.name}
-                </option>
+            <div style={{ display: "flex", gap: "0.5rem" }}>
+              {[
+                { value: "improvement", label: "👌 Verbesserung", desc: "Bestehendes Feature verbessern" },
+                { value: "feature", label: "⭐ Neues Feature", desc: "Komplett neue Funktion" },
+              ].map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => setIdeaType(opt.value)}
+                  className={ideaType === opt.value ? "btn-primary" : "btn-secondary"}
+                  style={{ flex: 1, flexDirection: "column", padding: "0.75rem", fontSize: "0.8125rem", textAlign: "center" }}
+                >
+                  <div style={{ fontWeight: 600 }}>{opt.label}</div>
+                  <div style={{ fontSize: "0.7rem", opacity: 0.8, marginTop: "0.125rem" }}>{opt.desc}</div>
+                </button>
               ))}
-            </select>
+            </div>
           </div>
+
+          {/* Step 2: Plattform */}
+          {ideaType && (
+            <div>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: "0.875rem",
+                  fontWeight: 600,
+                  marginBottom: "0.5rem",
+                }}
+              >
+                Welche Plattform betrifft es?{" "}
+                <span style={{ color: "var(--color-primary-600)" }}>*</span>
+              </label>
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                {[
+                  { value: "web", label: "🖥️ Web" },
+                  { value: "app", label: "📱 App" },
+                  { value: "both", label: "🔄 Beides" },
+                ].map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setPlatform(opt.value)}
+                    className={platform === opt.value ? "btn-primary" : "btn-secondary"}
+                    style={{ flex: 1, padding: "0.625rem", fontSize: "0.8125rem" }}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Kategorie (Topic) */}
+          {ideaType && platform && (
+            <div>
+              <label
+                htmlFor="topic"
+                style={{
+                  display: "block",
+                  fontSize: "0.875rem",
+                  fontWeight: 600,
+                  marginBottom: "0.5rem",
+                }}
+              >
+                Kategorie{" "}
+                <span style={{ color: "var(--color-primary-600)" }}>*</span>
+              </label>
+              <select
+                id="topic"
+                name="topic"
+                required
+                className="input"
+                style={{
+                  cursor: "pointer",
+                  appearance: "none",
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L2 4h8z'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "right 0.75rem center",
+                  paddingRight: "2.5rem",
+                }}
+              >
+                <option value="">— Bitte wählen —</option>
+                {topics.map((topic) => (
+                  <option key={topic.id} value={topic.id}>
+                    {topic.emoji} {topic.name}
+                  </option>
+                ))}
+              </select>
+              {/* Hidden fields for type and platform */}
+              <input type="hidden" name="ideaType" value={ideaType} />
+              <input type="hidden" name="platform" value={platform} />
+            </div>
+          )}
 
           {/* Title */}
           <div>

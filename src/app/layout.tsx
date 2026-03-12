@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 
 const navItems = [
   { href: "/requests", label: "Ideen", icon: "" },
-  { href: "/report", label: "Problem", icon: "" },
+  { href: "/report", label: "Probleme", icon: "" },
   { href: "/roadmap", label: "Roadmap", icon: "" },
   { href: "/announcements", label: "Neuigkeiten", icon: "" },
 ];

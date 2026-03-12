@@ -60,7 +60,7 @@ export default function DuplicateSuggestions({ title }: { title: string }) {
           marginBottom: "0.5rem",
         }}
       >
-        💡 Meinst du vielleicht...?
+        💡 Ähnliche Ideen gefunden!
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
         {suggestions.map((idea) => (
@@ -110,7 +110,7 @@ export default function DuplicateSuggestions({ title }: { title: string }) {
           fontStyle: "italic",
         }}
       >
-        Prüfe, ob deine Idee schon existiert, bevor du eine neue einreichst.
+        Um die Sichtbarkeit zu erhöhen, kann es sich für dich mehr lohnen, einer bestehenden Idee einen Upvote zu geben und ergänzend zu kommentieren, was noch nicht abgedeckt ist.
       </div>
     </div>
   );
