@@ -472,9 +472,15 @@ body {
     padding-bottom: 5rem !important;
   }
 
-  /* Hide desktop header nav container padding */
+  /* Adjust header layout for mobile */
   header > div {
     padding: 0 1rem !important;
+    height: 3.5rem !important;
+  }
+
+  /* Ensure logo stays visible */
+  header > div > a:first-child {
+    flex-shrink: 0;
   }
 }
 
