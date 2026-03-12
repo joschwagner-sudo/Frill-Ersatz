@@ -26,6 +26,7 @@ model User {
   announcementReactions AnnouncementReaction[]
   notifications         Notification[]
   commentReactions      CommentReaction[]
+  sentEmails            EmailBroadcast[]   @relation("SentEmails")
 }
 
 // ─── Auth Code (Magic Link 6-digit) ───────────────────
@@ -184,6 +185,29 @@ model ReportToIntercom {
   intercomDeliveryStatus String   @default("PENDING") // PENDING | SENT | FAILED
   intercomResponse       String?
   createdAt              DateTime @default(now())
+}
+
+// ─── Admin Email Broadcast ────────────────────────────
+model EmailBroadcast {
+  id             String   @id @default(cuid())
+  subject        String
+  body           String   // markdown
+  bodyHtml       String   // rendered HTML
+  recipientType  String   // ALL | IDEA_VOTERS | ADMINS | CUSTOM
+  recipientFilter String? // e.g. idea ID for IDEA_VOTERS
+  recipientCount Int      @default(0)
+  sentCount      Int      @default(0)
+  failedCount    Int      @default(0)
+  status         String   @default("DRAFT") // DRAFT | SENDING | SENT | FAILED
+  sentAt         DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  sentById       String
+  sentBy         User     @relation("SentEmails", fields: [sentById], references: [id])
+
+  @@index([status])
+  @@index([createdAt])
 }
 
 // ─── Comment ──────────────────────────────────────────

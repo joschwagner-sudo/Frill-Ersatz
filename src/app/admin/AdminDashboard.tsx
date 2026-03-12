@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import AdminEmails from "./AdminEmails";
 
 type Idea = {
   id: string;
@@ -460,6 +461,7 @@ export default function AdminDashboard({
         {[
           { label: "Ideen", value: "ideas" },
           { label: "Neuigkeiten", value: "announcements" },
+          { label: "E-Mails", value: "emails" },
           { label: "Nutzer", value: "users" },
         ].map((tab) => (
           <Link
@@ -835,6 +837,11 @@ export default function AdminDashboard({
             </div>
           )}
         </div>
+      )}
+
+      {/* Emails Tab */}
+      {currentTab === "emails" && (
+        <AdminEmails ideas={ideas.filter((i) => i.approvalStatus === "APPROVED").map((i) => ({ id: i.id, number: i.number, title: i.title }))} />
       )}
 
       {/* Merge Modal */}
