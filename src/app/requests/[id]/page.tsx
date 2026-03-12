@@ -205,12 +205,12 @@ export default async function RequestDetailPage({
                   {t.topic.emoji} {t.topic.name}
                 </span>
               ))}
-              {request.status && (
+              {request.status && statusConfig[request.status] && (
                 <span
-                  className={`badge ${statusConfig[request.status]?.class || ""}`}
+                  className={`badge ${statusConfig[request.status].class}`}
                 >
-                  {statusConfig[request.status]?.emoji}{" "}
-                  {statusConfig[request.status]?.label || request.status}
+                  {statusConfig[request.status].emoji}{" "}
+                  {statusConfig[request.status].label}
                 </span>
               )}
             </div>
