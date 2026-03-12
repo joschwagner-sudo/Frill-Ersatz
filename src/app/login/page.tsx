@@ -76,7 +76,9 @@ export default function LoginPage() {
             }}
         >
             <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-                <div style={{ fontSize: "2.5rem", marginBottom: "0.75rem" }}>🔐</div>
+                <div style={{ marginBottom: "0.75rem" }}>
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-600)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
                 <h1 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.02em" }}>
                     Anmelden
                 </h1>

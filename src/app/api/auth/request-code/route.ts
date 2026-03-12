@@ -28,50 +28,36 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        // Send code via email or show directly in dev mode
-        const useResend = process.env.RESEND_API_KEY && process.env.EMAIL_FROM;
-
-        if (useResend) {
-            const resend = new Resend(process.env.RESEND_API_KEY);
-            const fromEmail = process.env.EMAIL_FROM!;
-
-            const { error } = await resend.emails.send({
-                from: fromEmail,
-                to: normalizedEmail,
-                subject: "Dein Login-Code für Copilot",
-                html: `
-                    <div style="font-family: 'Outfit', system-ui, sans-serif; max-width: 400px; margin: 0 auto; padding: 2rem;">
-                        <h2 style="color: #15284B; margin-bottom: 0.5rem;">Dein Login-Code</h2>
-                        <p style="color: #6D778B; font-size: 0.9rem;">Gib diesen Code ein, um dich bei Copilot anzumelden:</p>
-                        <div style="background: #EDF0FC; border-radius: 12px; padding: 1.5rem; text-align: center; margin: 1.5rem 0;">
-                            <span style="font-size: 2rem; font-weight: 700; letter-spacing: 0.3em; color: #4D6BDD;">${code}</span>
+        // Always return code directly for testing (demo mode)
+        // Also try to send via email if Resend is configured
+        if (process.env.RESEND_API_KEY && process.env.EMAIL_FROM) {
+            try {
+                const resend = new Resend(process.env.RESEND_API_KEY);
+                await resend.emails.send({
+                    from: process.env.EMAIL_FROM,
+                    to: normalizedEmail,
+                    subject: "Dein Login-Code für Copilot",
+                    html: `
+                        <div style="font-family: 'Outfit', system-ui, sans-serif; max-width: 400px; margin: 0 auto; padding: 2rem;">
+                            <h2 style="color: #15284B; margin-bottom: 0.5rem;">Dein Login-Code</h2>
+                            <p style="color: #6D778B; font-size: 0.9rem;">Gib diesen Code ein, um dich bei Copilot anzumelden:</p>
+                            <div style="background: #EDF0FC; border-radius: 12px; padding: 1.5rem; text-align: center; margin: 1.5rem 0;">
+                                <span style="font-size: 2rem; font-weight: 700; letter-spacing: 0.3em; color: #4D6BDD;">${code}</span>
+                            </div>
+                            <p style="color: #8A93A5; font-size: 0.8rem;">Der Code ist 10 Minuten gültig.</p>
                         </div>
-                        <p style="color: #8A93A5; font-size: 0.8rem;">Der Code ist 10 Minuten gültig. Falls du diesen Login nicht angefordert hast, ignoriere diese Mail.</p>
-                    </div>
-                `,
-            });
-
-            if (error) {
-                console.error("Resend error:", error);
-                return NextResponse.json(
-                    { error: "Code konnte nicht gesendet werden. Bitte versuche es erneut." },
-                    { status: 500 }
-                );
+                    `,
+                });
+            } catch (err) {
+                console.error("Resend error (non-blocking):", err);
             }
-
-            return NextResponse.json({
-                success: true,
-                message: "Code gesendet! Überprüfe deine E-Mails.",
-            });
-        } else {
-            // Dev mode: return code directly so anyone can test
-            console.log(`\n🔐 [DEV] Auth code for ${normalizedEmail}: ${code}\n`);
-            return NextResponse.json({
-                success: true,
-                message: "Code gesendet! Überprüfe deine E-Mails.",
-                devCode: code,
-            });
         }
+
+        return NextResponse.json({
+            success: true,
+            message: "Code bereit!",
+            devCode: code,
+        });
     } catch (error) {
         console.error("Auth request-code error:", error);
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });

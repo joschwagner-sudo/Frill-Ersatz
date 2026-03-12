@@ -170,8 +170,7 @@ export default function NewRequestPage() {
           </div>
 
           {/* Step 2: Plattform */}
-          {ideaType && (
-            <div>
+          <div style={{ opacity: ideaType ? 1 : 0.4, transition: "opacity 0.2s" }}>
               <label
                 style={{
                   display: "block",
@@ -200,13 +199,11 @@ export default function NewRequestPage() {
                   </button>
                 ))}
               </div>
-            </div>
-          )}
+          </div>
 
           {/* Step 3: Kategorie (Topic) */}
-          {ideaType && platform && (
-            <div>
-              <label
+          <div style={{ opacity: ideaType && platform ? 1 : 0.4, transition: "opacity 0.2s" }}>
+            <label
                 htmlFor="topic"
                 style={{
                   display: "block",
@@ -240,10 +237,9 @@ export default function NewRequestPage() {
                 ))}
               </select>
               {/* Hidden fields for type and platform */}
-              <input type="hidden" name="ideaType" value={ideaType} />
-              <input type="hidden" name="platform" value={platform} />
-            </div>
-          )}
+            <input type="hidden" name="ideaType" value={ideaType} />
+            <input type="hidden" name="platform" value={platform} />
+          </div>
 
           {/* Title */}
           <div>

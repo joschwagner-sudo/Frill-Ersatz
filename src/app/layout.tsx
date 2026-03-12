@@ -105,6 +105,15 @@ export default async function RootLayout({
               Admin
             </Link>
           )}
+          {userId ? (
+            <Link href="/account" className="nav-link">
+              Profil
+            </Link>
+          ) : (
+            <Link href="/login" className="nav-link">
+              Login
+            </Link>
+          )}
         </nav>
 
         {/* ─── Main Content ─── */}
