@@ -89,3 +89,4 @@ The seed script creates:
 - **Markdown**: Stored raw, rendered as plain text (upgrade with `marked` + `dompurify`)
 - **Rate limiting**: Per-user via DB count (add in-memory IP limiting for production)
 - **SQLite → Postgres**: Change `DATABASE_URL` and `provider` in schema
+# Fri Mar 20 18:07:50 CET 2026
