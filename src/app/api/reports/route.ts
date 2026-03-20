@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
                 description,
                 userEmail,
                 pageUrl: pageUrl || null,
-                intercomDeliveryStatus: "PENDING",
+                deliveryStatus: "PENDING",
             },
         });
 
@@ -50,16 +50,16 @@ export async function POST(request: NextRequest) {
                 await prisma.reportToIntercom.update({
                     where: { id: report.id },
                     data: {
-                        intercomDeliveryStatus: res.ok ? "SENT" : "FAILED",
-                        intercomResponse: `HTTP ${res.status}`,
+                        deliveryStatus: res.ok ? "SENT" : "FAILED",
+                        deliveryResponse: `HTTP ${res.status}`,
                     },
                 });
             } catch (err) {
                 await prisma.reportToIntercom.update({
                     where: { id: report.id },
                     data: {
-                        intercomDeliveryStatus: "FAILED",
-                        intercomResponse: String(err),
+                        deliveryStatus: "FAILED",
+                        deliveryResponse: String(err),
                     },
                 });
             }

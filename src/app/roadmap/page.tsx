@@ -59,8 +59,9 @@ export default async function RoadmapPage() {
   // Group by quarter
   const quarters = roadmapItems.reduce(
     (acc, item) => {
-      if (!acc[item.quarter]) acc[item.quarter] = [];
-      acc[item.quarter].push(item);
+      const q = item.quarter || "Ungeplant";
+      if (!acc[q]) acc[q] = [];
+      acc[q].push(item);
       return acc;
     },
     {} as Record<string, typeof roadmapItems>
